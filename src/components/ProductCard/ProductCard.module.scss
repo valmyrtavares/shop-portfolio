@@ -1,0 +1,86 @@
+@use '../../styles/variables' as *;
+
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  cursor: pointer;
+  transition: $transition-smooth;
+  
+  &:hover {
+    .imageWrapper img {
+      transform: scale(1.02);
+    }
+    .quickView {
+      opacity: 1;
+      transform: translate(-50%, -50%);
+    }
+  }
+}
+
+.quickView {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, calc(-50% + 20px));
+  background-color: white;
+  color: black;
+  padding: 1rem 2rem;
+  font-family: $font-sans;
+  font-size: 0.7rem;
+  letter-spacing: 0.2rem;
+  opacity: 0;
+  transition: $transition-smooth;
+  pointer-events: none;
+  z-index: 10;
+}
+
+.imageWrapper {
+  position: relative;
+  overflow: hidden;
+  background-color: $color-surface;
+  aspect-ratio: 3 / 4;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+}
+
+.badge {
+  position: absolute;
+  top: 1rem;
+  left: 1rem;
+  background-color: rgba(255, 255, 255, 0.9);
+  padding: 0.4rem 0.8rem;
+  font-family: $font-sans;
+  font-size: 0.6rem;
+  letter-spacing: 0.1rem;
+  font-weight: 500;
+  color: $color-text-muted;
+}
+
+.details {
+  text-align: center;
+  
+  .name {
+    font-size: 1.2rem;
+    font-weight: 400;
+    margin-bottom: 0.5rem;
+    color: $color-text;
+    text-transform: uppercase;
+    letter-spacing: 0.1rem;
+  }
+  
+  .price {
+    font-family: $font-sans;
+    font-size: 0.85rem;
+    color: $color-text-muted;
+    font-weight: 300;
+  }
+}

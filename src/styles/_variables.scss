@@ -1,0 +1,19 @@
+// Typography
+$font-serif: 'Cormorant Garamond', serif;
+$font-sans: 'Inter', sans-serif;
+
+// Colors
+$color-bg: #ffffff;
+$color-text: #1a1a1a;
+$color-text-muted: #666666;
+$color-border: #eeeeee;
+$color-accent: #2c3e50;
+$color-surface: #f9f9f9;
+
+// Layout
+$max-width: 1400px;
+$header-height: 100px;
+$container-padding: 2rem;
+
+// Transitions
+$transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);

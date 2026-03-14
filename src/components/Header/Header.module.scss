@@ -1,0 +1,99 @@
+@use '../../styles/variables' as *;
+
+.header {
+  width: 100%;
+  padding: 4rem 0 2rem;
+  background-color: $color-bg;
+  border-bottom: 1px solid transparent;
+  
+  .container {
+    max-width: $max-width;
+    margin: 0 auto;
+    padding: 0 $container-padding;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2.5rem;
+  }
+}
+
+.logo {
+  text-align: center;
+  
+  h1 {
+    font-size: 2.5rem;
+    letter-spacing: 0.3rem;
+    font-weight: 300;
+    margin-bottom: 0.5rem;
+    color: $color-text;
+    text-transform: uppercase;
+  }
+  
+  p {
+    font-family: $font-sans;
+    font-size: 0.7rem;
+    letter-spacing: 0.4rem;
+    font-weight: 300;
+    color: $color-text-muted;
+    text-transform: uppercase;
+  }
+}
+
+.nav {
+  ul {
+    display: flex;
+    gap: 3rem;
+    
+    li {
+      a {
+        font-family: $font-sans;
+        font-size: 0.75rem;
+        font-weight: 400;
+        letter-spacing: 0.15rem;
+        color: $color-text;
+        text-transform: uppercase;
+        position: relative;
+        padding-bottom: 4px;
+        
+        &::after {
+          content: '';
+          position: absolute;
+          bottom: 0;
+          left: 50%;
+          width: 0;
+          height: 1px;
+          background-color: $color-text;
+          transition: $transition-smooth;
+          transform: translateX(-50%);
+        }
+        
+        &:hover {
+          color: $color-text;
+          
+          &::after {
+            width: 100%;
+          }
+        }
+      }
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .header {
+    padding: 2rem 0;
+  }
+  
+  .nav ul {
+    gap: 1.5rem;
+    
+    li a {
+      font-size: 0.65rem;
+      letter-spacing: 0.1rem;
+    }
+  }
+  
+  .logo h1 {
+    font-size: 1.8rem;
+  }
+}

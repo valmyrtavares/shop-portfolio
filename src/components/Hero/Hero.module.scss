@@ -1,0 +1,78 @@
+@use '../../styles/variables' as *;
+
+.hero {
+  position: relative;
+  height: 60vh;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: $color-bg;
+  overflow: hidden;
+
+  .content {
+    position: relative;
+    z-index: 1;
+    text-align: center;
+    color: $color-text;
+    padding: 2rem;
+  }
+
+  .title {
+    font-size: clamp(3rem, 10vw, 6rem);
+    line-height: 0.9;
+    letter-spacing: 0.5rem;
+    margin-bottom: 2rem;
+    font-weight: 300;
+    animation: fadeInUp 1.5s ease-out;
+  }
+
+  .subtitle {
+    font-family: $font-sans;
+    font-size: 0.8rem;
+    letter-spacing: 0.4rem;
+    font-weight: 400;
+    margin-bottom: 3.5rem;
+    opacity: 0.8;
+    animation: fadeInUp 1.5s ease-out 0.3s backwards;
+  }
+
+  .cta {
+    background: $color-text;
+    color: white;
+    border: none;
+    padding: 1.2rem 2.8rem;
+    font-family: $font-sans;
+    font-size: 0.75rem;
+    letter-spacing: 0.2rem;
+    cursor: pointer;
+    transition: $transition-smooth;
+    animation: fadeInUp 1.5s ease-out 0.6s backwards;
+
+    &:hover {
+      background: $color-accent;
+      transform: translateY(-5px);
+    }
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 768px) {
+  .hero {
+    height: 70vh;
+  }
+  
+  .title {
+    letter-spacing: 0.2rem;
+  }
+}
