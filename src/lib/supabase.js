@@ -4,7 +4,11 @@ const supabaseUrl = import.meta.env.VITE_SB_ENDPOINT
 const supabaseAnonKey = import.meta.env.VITE_SB_TOKEN
 
 if (!supabaseUrl || !supabaseAnonKey) {
-  console.error('Supabase credentials missing from .env file')
+  console.warn('Supabase credentials missing. Check Vercel environment variables.')
 }
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey)
+// Fallback to empty strings to avoid crash on createClient(undefined)
+export const supabase = createClient(
+  supabaseUrl || 'https://placeholder.supabase.co', 
+  supabaseAnonKey || 'placeholder'
+)
