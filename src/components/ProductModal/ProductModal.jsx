@@ -32,7 +32,15 @@ const ProductModal = ({ product, onClose }) => {
             HANDMADE WITH PRECISION AND CARE. EVERY STITCH TELLS A STORY OF TIMELESS CRAFTSMANSHIP.
             CRAFTED FROM PREMIUM BRAZILIAN LEATHER.
           </p>
-          <button className={styles.buyButton}>CHECK AVAILABILITY</button>
+          <button 
+            className={styles.buyButton}
+            onClick={() => {
+              const message = encodeURIComponent(`Olá! Gostaria de verificar a disponibilidade da bolsa: ${product.name}`);
+              window.open(`https://wa.me/5511999999999?text=${message}`, '_blank');
+            }}
+          >
+            CHECK AVAILABILITY
+          </button>
         </div>
       </div>
     </div>

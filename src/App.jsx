@@ -1,67 +1,85 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Header from './components/Header/Header';
 import Hero from './components/Hero/Hero';
 import ProductGrid from './components/ProductGrid/ProductGrid';
 import About from './components/About/About';
+import Contact from './components/Contact/Contact';
 import ProductModal from './components/ProductModal/ProductModal';
-
-const BAGS_DATA = [
-  {
-    id: 1,
-    name: 'AMARA CLUTCH',
-    price: 'R$ 890,00',
-    image: 'https://images.unsplash.com/photo-1584917865442-de89df76afd3?auto=format&fit=crop&q=80&w=800',
-    isOutOfStock: false
-  },
-  {
-    id: 2,
-    name: 'SOPHIA TOTE',
-    price: 'R$ 1.250,00',
-    image: 'https://images.unsplash.com/photo-1590874103328-eac38a683ce7?auto=format&fit=crop&q=80&w=800',
-    isOutOfStock: false
-  },
-  {
-    id: 3,
-    name: 'LUNA BUCKET',
-    price: 'R$ 740,00',
-    image: 'https://images.unsplash.com/photo-1591561954557-26941169b49e?auto=format&fit=crop&q=80&w=800',
-    isOutOfStock: true
-  },
-  {
-    id: 4,
-    name: 'ELARA SHOULDER',
-    price: 'R$ 980,00',
-    image: 'https://images.unsplash.com/photo-1548036328-c9fa89d128fa?auto=format&fit=crop&q=80&w=800',
-    isOutOfStock: false
-  },
-  {
-    id: 5,
-    name: 'GAIA HOBO',
-    price: 'R$ 1.100,00',
-    image: 'https://images.unsplash.com/photo-1594223274512-ad4803739b7c?auto=format&fit=crop&q=80&w=800',
-    isOutOfStock: false
-  },
-  {
-    id: 6,
-    name: 'IRIS MINAUDIÈRE',
-    price: 'R$ 620,00',
-    image: 'https://images.unsplash.com/photo-1566150902887-9679ecc155ba?auto=format&fit=crop&q=80&w=800',
-    isOutOfStock: false
-  }
-];
+import AdminForm from './components/Admin/AdminForm';
+import { supabase } from './lib/supabase';
 
 function App() {
+  const [products, setProducts] = useState([]);
   const [selectedProduct, setSelectedProduct] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [isAdmin, setIsAdmin] = useState(false);
+
+  useEffect(() => {
+    // Check if URL has ?admin=true
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('admin') === 'true') {
+      setIsAdmin(true);
+    }
+
+    fetchProducts();
+  }, []);
+
+  const fetchProducts = async () => {
+    try {
+      setLoading(true);
+      const { data, error } = await supabase
+        .from('products')
+        .select('*')
+        .order('id', { ascending: true });
+
+      if (error) throw error;
+      setProducts(data || []);
+    } catch (error) {
+      console.error('Error fetching products:', error.message);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="app">
       <Header />
       <main>
-        <Hero />
-        <section id="collection">
-          <ProductGrid products={BAGS_DATA} onProductClick={setSelectedProduct} />
-        </section>
-        <About />
+        {isAdmin ? (
+          <section id="admin">
+            <div style={{ textAlign: 'center', paddingTop: '4rem' }}>
+              <button 
+                onClick={() => setIsAdmin(false)}
+                style={{ 
+                  background: 'none', 
+                  border: '1px solid #ddd', 
+                  padding: '0.5rem 1rem', 
+                  fontSize: '0.6rem', 
+                  letterSpacing: '0.1rem',
+                  cursor: 'pointer'
+                }}
+              >
+                &larr; VOLTAR AO SITE
+              </button>
+            </div>
+            <AdminForm onProductAdded={fetchProducts} />
+          </section>
+        ) : (
+          <>
+            <Hero />
+            <section id="collection">
+              {loading ? (
+                <div style={{ textAlign: 'center', padding: '10rem 0', letterSpacing: '0.2rem', fontSize: '0.8rem', opacity: 0.5 }}>
+                  LOADING COLLECTION...
+                </div>
+              ) : (
+                <ProductGrid products={products} onProductClick={setSelectedProduct} />
+              )}
+            </section>
+            <About />
+            <Contact />
+          </>
+        )}
       </main>
       <footer style={{ textAlign: 'center', padding: '6rem 0', background: '#f9f9f9', letterSpacing: '0.1rem' }}>
         <p style={{ fontSize: '0.7rem', opacity: 0.6 }}>&copy; 2026 VALERIA MONIS HANDMADE. ALL RIGHTS RESERVED.</p>

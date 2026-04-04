@@ -84,3 +84,19 @@
     font-weight: 300;
   }
 }
+
+@media (max-width: 640px) {
+  .details {
+    .name {
+      font-size: 1rem;
+    }
+    
+    .price {
+      font-size: 0.75rem;
+    }
+  }
+
+  .quickView {
+    display: none; // Disable quick view on mobile for simplicity
+  }
+}

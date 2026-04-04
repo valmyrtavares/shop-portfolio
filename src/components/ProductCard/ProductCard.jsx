@@ -6,7 +6,7 @@ const ProductCard = ({ product, onClick }) => {
     <div className={styles.card} onClick={onClick}>
       <div className={styles.imageWrapper}>
         <img src={product.image} alt={product.name} />
-        {product.isOutOfStock && <span className={styles.badge}>OUT OF STOCK</span>}
+        {product.is_out_of_stock && <span className={styles.badge}>OUT OF STOCK</span>}
         <div className={styles.quickView}>QUICK VIEW</div>
       </div>
       <div className={styles.details}>
