@@ -29,8 +29,7 @@ const ProductModal = ({ product, onClose }) => {
           <p className={styles.price}>{product.price}</p>
           <div className={styles.divider}></div>
           <p className={styles.description}>
-            HANDMADE WITH PRECISION AND CARE. EVERY STITCH TELLS A STORY OF TIMELESS CRAFTSMANSHIP.
-            CRAFTED FROM PREMIUM BRAZILIAN LEATHER.
+            {product.description?.toUpperCase() || 'HANDMADE WITH PRECISION AND CARE. EVERY STITCH TELLS A STORY OF TIMELESS CRAFTSMANSHIP.'}
           </p>
           <button 
             className={styles.buyButton}
