@@ -8,6 +8,7 @@ const AdminForm = ({ onProductAdded, productToEdit, onCancel }) => {
     price: productToEdit?.price || '',
     description: productToEdit?.description || '',
     is_out_of_stock: productToEdit?.is_out_of_stock || false,
+    is_featured: productToEdit?.is_featured || false,
     category_id: productToEdit?.category_id || ''
   });
   const [categories, setCategories] = useState([]);
@@ -111,7 +112,7 @@ const AdminForm = ({ onProductAdded, productToEdit, onCancel }) => {
 
         if (insertError) throw insertError;
         setMessage({ type: 'success', text: 'PRODUTO ADICIONADO COM SUCESSO!' });
-        setFormData({ name: '', price: '', description: '', is_out_of_stock: false, category_id: '' });
+        setFormData({ name: '', price: '', description: '', is_out_of_stock: false, is_featured: false, category_id: '' });
         setImageFile(null);
         e.target.reset();
       }
@@ -217,6 +218,17 @@ const AdminForm = ({ onProductAdded, productToEdit, onCancel }) => {
             onChange={handleInputChange} 
           />
           <label htmlFor="is_out_of_stock">OUT OF STOCK</label>
+        </div>
+
+        <div className={styles.checkboxGroup}>
+          <input 
+            type="checkbox" 
+            id="is_featured" 
+            name="is_featured" 
+            checked={formData.is_featured} 
+            onChange={handleInputChange} 
+          />
+          <label htmlFor="is_featured" style={{ color: '#d4af37', fontWeight: 'bold' }}>⭐ PRODUCT IN FEATURED (DESTAQUE)</label>
         </div>
 
         <div className={styles.buttonGroup}>

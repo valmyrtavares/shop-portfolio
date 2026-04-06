@@ -125,6 +125,34 @@
   }
 }
 
+.sectionSubtitle {
+  font-family: $font-sans;
+  font-size: 0.8rem;
+  letter-spacing: 0.2rem;
+  color: $color-text;
+  margin-top: 1rem;
+  font-weight: 600;
+  border-left: 3px solid $color-text;
+  padding-left: 1rem;
+}
+
+.gridFields {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+  
+  @media (max-width: 600px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.dividerFull {
+  width: 100%;
+  height: 1px;
+  background-color: $color-border;
+  margin: 1rem 0;
+}
+
 .buttonGroup {
   display: flex;
   gap: 1.5rem;

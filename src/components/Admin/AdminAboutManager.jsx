@@ -6,7 +6,14 @@ const AdminAboutManager = ({ onBack }) => {
   const [formData, setFormData] = useState({
     title: '',
     description: '',
-    image_url: ''
+    image_url: '',
+    phone: '',
+    email: '',
+    address: '',
+    whatsapp: '',
+    instagram: '',
+    pinterest: '',
+    formspree_url: ''
   });
   const [imageFile, setImageFile] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -28,7 +35,14 @@ const AdminAboutManager = ({ onBack }) => {
         setFormData({
           title: data.title || '',
           description: data.description || '',
-          image_url: data.image_url || ''
+          image_url: data.image_url || '',
+          phone: data.phone || '',
+          email: data.email || '',
+          address: data.address || '',
+          whatsapp: data.whatsapp || '',
+          instagram: data.instagram || '',
+          pinterest: data.pinterest || '',
+          formspree_url: data.formspree_url || ''
         });
       }
     } catch (error) {
@@ -79,8 +93,7 @@ const AdminAboutManager = ({ onBack }) => {
         .from('about_content')
         .upsert({
           id: 1,
-          title: formData.title,
-          description: formData.description,
+          ...formData,
           image_url: currentImageUrl,
           updated_at: new Date().toISOString()
         });
@@ -102,11 +115,12 @@ const AdminAboutManager = ({ onBack }) => {
     <div className={styles.managerContainer}>
       <div className={styles.header}>
         <span className={styles.label}>ADMINISTRATION</span>
-        <h2 className={styles.title}>Manage About Section</h2>
+        <h2 className={styles.title}>Manage About & Contact</h2>
         <div className={styles.divider}></div>
       </div>
 
       <form className={styles.form} onSubmit={handleSubmit}>
+        <h3 className={styles.sectionSubtitle}>ABOUT SECTION</h3>
         <div className={styles.inputGroup}>
           <label>ARTISAN NAME / TITLE</label>
           <input 
@@ -129,11 +143,10 @@ const AdminAboutManager = ({ onBack }) => {
             rows="10"
             className={styles.textarea}
           />
-          <small style={{ opacity: 0.5 }}>Atualmente apenas texto simples é suportado para garantir compatibilidade.</small>
         </div>
 
         <div className={styles.inputGroup}>
-          <label>ABOUT IMAGE {formData.image_url && '(CURRENT IMAGE EXISTS)'}</label>
+          <label>ABOUT IMAGE</label>
           {formData.image_url && (
             <div className={styles.currentImage}>
               <img src={formData.image_url} alt="Current About" />
@@ -146,9 +159,52 @@ const AdminAboutManager = ({ onBack }) => {
           />
         </div>
 
+        <div className={styles.dividerFull}></div>
+        <h3 className={styles.sectionSubtitle}>CONTACT INFORMATION</h3>
+
+        <div className={styles.gridFields}>
+          <div className={styles.inputGroup}>
+            <label>PHONE (DISPLAY)</label>
+            <input name="phone" value={formData.phone} onChange={handleInputChange} placeholder="+55 11 99999-9999" />
+          </div>
+          <div className={styles.inputGroup}>
+            <label>WHATSAPP NUMBER (ONLY NUMBERS)</label>
+            <input name="whatsapp" value={formData.whatsapp} onChange={handleInputChange} placeholder="5511999999999" />
+          </div>
+        </div>
+
+        <div className={styles.inputGroup}>
+          <label>EMAIL ADDRESS</label>
+          <input name="email" value={formData.email} onChange={handleInputChange} placeholder="HELLO@VALERIAMONIS.COM" />
+        </div>
+
+        <div className={styles.inputGroup}>
+          <label>ADDRESS (DISPLAY)</label>
+          <input name="address" value={formData.address} onChange={handleInputChange} placeholder="RUA DAS ARTES, 123 - SP" />
+        </div>
+
+        <div className={styles.dividerFull}></div>
+        <h3 className={styles.sectionSubtitle}>SOCIAL & FORMSPREE</h3>
+
+        <div className={styles.gridFields}>
+          <div className={styles.inputGroup}>
+            <label>INSTAGRAM ID</label>
+            <input name="instagram" value={formData.instagram} onChange={handleInputChange} placeholder="valeriamonis" />
+          </div>
+          <div className={styles.inputGroup}>
+            <label>PINTEREST ID</label>
+            <input name="pinterest" value={formData.pinterest} onChange={handleInputChange} placeholder="valeriamonis" />
+          </div>
+        </div>
+
+        <div className={styles.inputGroup}>
+          <label>FORMSPREE ENDPOINT URL</label>
+          <input name="formspree_url" value={formData.formspree_url} onChange={handleInputChange} placeholder="https://formspree.io/f/your-id" />
+        </div>
+
         <div className={styles.buttonGroup}>
           <button type="submit" className={styles.submitButton} disabled={loading}>
-            {loading ? 'SAVING...' : 'SAVE CHANGES'}
+            {loading ? 'SAVING...' : 'SAVE ALL CHANGES'}
           </button>
           
           <button type="button" className={styles.cancelButton} onClick={onBack}>

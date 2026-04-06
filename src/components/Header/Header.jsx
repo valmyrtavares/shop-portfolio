@@ -1,7 +1,7 @@
 import React from 'react';
 import styles from './Header.module.scss';
 
-const Header = ({ isAdmin, onToggleAdmin, categories, onCategorySelect }) => {
+const Header = ({ isAdmin, onToggleAdmin, categories, onCategorySelect, onCarouselOpen }) => {
   return (
     <header className={styles.header}>
       <div className={styles.container}>
@@ -34,7 +34,18 @@ const Header = ({ isAdmin, onToggleAdmin, categories, onCategorySelect }) => {
             </li>
             <li><a href="#about" onClick={() => onToggleAdmin(false)}>SOBRE</a></li>
             <li><a href="#contact" onClick={() => onToggleAdmin(false)}>CONTATO</a></li>
-            <li><a href="#shop" onClick={() => onToggleAdmin(false)}>SHOP</a></li>
+            <li>
+              <a 
+                href="#destaques" 
+                onClick={(e) => { 
+                  e.preventDefault(); 
+                  onToggleAdmin(false); 
+                  onCarouselOpen(); 
+                }}
+              >
+                DESTAQUES
+              </a>
+            </li>
             <li>
               <a 
                 href="#admin" 

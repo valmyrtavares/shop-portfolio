@@ -10,12 +10,15 @@ import AdminDashboard from './components/Admin/AdminDashboard';
 import AdminProductList from './components/Admin/AdminProductList';
 import AdminCategoryManager from './components/Admin/AdminCategoryManager';
 import AdminAboutManager from './components/Admin/AdminAboutManager';
+import FeaturedCarousel from './components/FeaturedCarousel/FeaturedCarousel';
 import { supabase } from './lib/supabase';
 
 function App() {
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
+  const [aboutContent, setAboutContent] = useState(null);
   const [selectedProduct, setSelectedProduct] = useState(null);
+  const [isCarouselOpen, setIsCarouselOpen] = useState(false);
   const [loading, setLoading] = useState(true);
   const [isAdmin, setIsAdmin] = useState(false);
   const [adminView, setAdminView] = useState('menu'); // 'menu', 'add', 'list', 'categories', 'about'
@@ -34,7 +37,7 @@ function App() {
   const fetchInitialData = async () => {
     try {
       setLoading(true);
-      await Promise.all([fetchProducts(), fetchCategories()]);
+      await Promise.all([fetchProducts(), fetchCategories(), fetchAboutContent()]);
     } finally {
       setLoading(false);
     }
@@ -67,6 +70,20 @@ function App() {
     }
   };
 
+  const fetchAboutContent = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('about_content')
+        .select('*')
+        .single();
+      
+      if (error && error.code !== 'PGRST116') throw error;
+      if (data) setAboutContent(data);
+    } catch (error) {
+      console.error('Error fetching about content:', error.message);
+    }
+  };
+
   const filteredProducts = activeCategory 
     ? products.filter(p => p.category_id === activeCategory.id)
     : products;
@@ -84,6 +101,7 @@ function App() {
           const el = document.getElementById('collection');
           if (el) el.scrollIntoView({ behavior: 'smooth' });
         }}
+        onCarouselOpen={() => setIsCarouselOpen(true)}
       />
       <main>
         {isAdmin ? (
@@ -137,7 +155,10 @@ function App() {
 
             {adminView === 'about' && (
               <AdminAboutManager 
-                onBack={() => setAdminView('menu')}
+                onBack={() => {
+                  setAdminView('menu');
+                  fetchInitialData();
+                }}
               />
             )}
           </section>
@@ -164,19 +185,33 @@ function App() {
                 <ProductGrid products={filteredProducts} onProductClick={setSelectedProduct} />
               )}
             </section>
-            <About />
-            <Contact />
+            <About content={aboutContent} />
+            <Contact contactInfo={aboutContent} />
           </>
         )}
       </main>
       <footer style={{ textAlign: 'center', padding: '6rem 0', background: '#f9f9f9', letterSpacing: '0.1rem' }}>
-        <p style={{ fontSize: '0.7rem', opacity: 0.6 }}>&copy; 2026 VALERIA MONIS HANDMADE. ALL RIGHTS RESERVED.</p>
+        <p style={{ fontSize: '0.7rem', opacity: 0.6 }}>&copy; 2026 {aboutContent?.title?.toUpperCase() || 'VALERIA MONIS'} HANDMADE. ALL RIGHTS RESERVED.</p>
         <div style={{ marginTop: '1.5rem', display: 'flex', justifyContent: 'center', gap: '2rem', fontSize: '0.6rem', fontWeight: 500 }}>
-          <a href="#instagram">INSTAGRAM</a>
-          <a href="#pinterest">PINTEREST</a>
+          {aboutContent?.instagram && (
+            <a href={`https://instagram.com/${aboutContent.instagram}`} target="_blank" rel="noopener noreferrer">INSTAGRAM</a>
+          )}
+          {aboutContent?.pinterest && (
+            <a href={`https://pinterest.com/${aboutContent.pinterest}`} target="_blank" rel="noopener noreferrer">PINTEREST</a>
+          )}
           <a href="#contact">CONTACT</a>
         </div>
       </footer>
+
+      {isCarouselOpen && (
+        <FeaturedCarousel 
+          products={products}
+          onClose={() => setIsCarouselOpen(false)}
+          onProductClick={(product) => {
+            setSelectedProduct(product);
+          }}
+        />
+      )}
 
       {selectedProduct && (
         <ProductModal 
