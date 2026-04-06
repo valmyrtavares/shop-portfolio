@@ -25,9 +25,14 @@ const Contact = ({ contactInfo }) => {
         <div className={styles.content}>
           <form 
             className={styles.form} 
-            action={info.formspree_url || '#'} 
+            action={`https://formsubmit.co/${info.email}`} 
             method="POST"
           >
+            {/* FormSubmit Configuration */}
+            <input type="hidden" name="_subject" value="Nova mensagem de contato - VALERIA MONIS" />
+            <input type="hidden" name="_template" value="table" />
+            <input type="hidden" name="_captcha" value="false" />
+            
             <div className={styles.inputGroup}>
               <input type="text" name="name" placeholder="NAME" required />
             </div>
@@ -38,11 +43,6 @@ const Contact = ({ contactInfo }) => {
               <textarea name="message" placeholder="MESSAGE" rows="5" required></textarea>
             </div>
             <button type="submit" className={styles.submitButton}>SEND MESSAGE</button>
-            {!info.formspree_url && (
-              <small style={{ marginTop: '0.5rem', opacity: 0.5, fontSize: '0.6rem' }}>
-                * Formspree URL not configured in Admin.
-              </small>
-            )}
           </form>
           
           <div className={styles.info}>

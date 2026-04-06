@@ -12,8 +12,7 @@ const AdminAboutManager = ({ onBack }) => {
     address: '',
     whatsapp: '',
     instagram: '',
-    pinterest: '',
-    formspree_url: ''
+    pinterest: ''
   });
   const [imageFile, setImageFile] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -41,8 +40,7 @@ const AdminAboutManager = ({ onBack }) => {
           address: data.address || '',
           whatsapp: data.whatsapp || '',
           instagram: data.instagram || '',
-          pinterest: data.pinterest || '',
-          formspree_url: data.formspree_url || ''
+          pinterest: data.pinterest || ''
         });
       }
     } catch (error) {
@@ -195,11 +193,6 @@ const AdminAboutManager = ({ onBack }) => {
             <label>PINTEREST ID</label>
             <input name="pinterest" value={formData.pinterest} onChange={handleInputChange} placeholder="valeriamonis" />
           </div>
-        </div>
-
-        <div className={styles.inputGroup}>
-          <label>FORMSPREE ENDPOINT URL</label>
-          <input name="formspree_url" value={formData.formspree_url} onChange={handleInputChange} placeholder="https://formspree.io/f/your-id" />
         </div>
 
         <div className={styles.buttonGroup}>

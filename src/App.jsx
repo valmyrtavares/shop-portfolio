@@ -194,12 +194,24 @@ function App() {
         <p style={{ fontSize: '0.7rem', opacity: 0.6 }}>&copy; 2026 {aboutContent?.title?.toUpperCase() || 'VALERIA MONIS'} HANDMADE. ALL RIGHTS RESERVED.</p>
         <div style={{ marginTop: '1.5rem', display: 'flex', justifyContent: 'center', gap: '2rem', fontSize: '0.6rem', fontWeight: 500 }}>
           {aboutContent?.instagram && (
-            <a href={`https://instagram.com/${aboutContent.instagram}`} target="_blank" rel="noopener noreferrer">INSTAGRAM</a>
+            <a 
+              href={aboutContent.instagram.startsWith('http') ? aboutContent.instagram : `https://instagram.com/${aboutContent.instagram}`} 
+              target="_blank" 
+              rel="noopener noreferrer"
+            >
+              INSTAGRAM
+            </a>
           )}
           {aboutContent?.pinterest && (
-            <a href={`https://pinterest.com/${aboutContent.pinterest}`} target="_blank" rel="noopener noreferrer">PINTEREST</a>
+            <a 
+              href={aboutContent.pinterest.startsWith('http') ? aboutContent.pinterest : `https://pinterest.com/${aboutContent.pinterest}`} 
+              target="_blank" 
+              rel="noopener noreferrer"
+            >
+              PINTEREST
+            </a>
           )}
-          <a href="#contact">CONTACT</a>
+          <a href="#contact" onClick={() => setActiveCategory(null)}>CONTACT</a>
         </div>
       </footer>
 
