@@ -12,19 +12,19 @@ const Header = ({ isAdmin, onToggleAdmin, categories, onCategorySelect, onCarous
         <nav className={styles.nav}>
           <ul>
             <li className={styles.hasDropdown}>
-              <a href="#collection" onClick={() => { onToggleAdmin(false); onCategorySelect(null); }}>
+              <a href="#collection" onClick={() => { onToggleAdmin(false); onCategorySelect(null, false); }}>
                 COLEÇÃO
               </a>
               {categories && categories.length > 0 && (
                 <ul className={styles.dropdown}>
                   <li key="all">
-                    <a href="#collection" onClick={(e) => { e.preventDefault(); onCategorySelect(null); }}>
+                    <a href="#collection" onClick={(e) => { e.preventDefault(); onCategorySelect(null, true); }}>
                       VER TUDO
                     </a>
                   </li>
                   {categories.map(cat => (
                     <li key={cat.id}>
-                      <a href="#collection" onClick={(e) => { e.preventDefault(); onCategorySelect(cat); }}>
+                      <a href="#collection" onClick={(e) => { e.preventDefault(); onCategorySelect(cat, true); }}>
                         {cat.name.toUpperCase()}
                       </a>
                     </li>

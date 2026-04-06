@@ -110,12 +110,14 @@ function App() {
         isAdmin={isAdmin && isAuthenticated} 
         onToggleAdmin={(val) => setIsAdmin(val)} 
         categories={categories}
-        onCategorySelect={(cat) => {
+        onCategorySelect={(cat, shouldScroll = true) => {
           setActiveCategory(cat);
           setAdminView('menu');
-          // Scroll to collection
-          const el = document.getElementById('collection');
-          if (el) el.scrollIntoView({ behavior: 'smooth' });
+          // Scroll to collection only if required
+          if (shouldScroll) {
+            const el = document.getElementById('collection');
+            if (el) el.scrollIntoView({ behavior: 'smooth' });
+          }
         }}
         onCarouselOpen={() => setIsCarouselOpen(true)}
       />

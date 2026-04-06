@@ -16,16 +16,34 @@
   gap: 4rem 3rem;
 }
 
+@media (max-width: 768px) {
+  .gridSection {
+    padding: 2rem 0 6rem;
+  }
+  
+  .container {
+    padding: 0; // Remove container padding to let carousel span full width or handle internally
+  }
+
+  .mobileCarousel {
+    padding: 0 1.5rem 2rem; // Side padding so the first/last items aren't touching edges
+    overflow: visible !important; // Essential for showing partial next slide
+    
+    :global {
+      .swiper-slide {
+        height: auto;
+      }
+    }
+  }
+
+  .grid {
+    display: none; // Hidden on mobile, replaced by Swiper
+  }
+}
+
 @media (max-width: 1024px) {
   .grid {
     grid-template-columns: repeat(2, 1fr);
     gap: 3rem 2rem;
-  }
-}
-
-@media (max-width: 640px) {
-  .grid {
-    grid-template-columns: 1fr;
-    gap: 3rem;
   }
 }
