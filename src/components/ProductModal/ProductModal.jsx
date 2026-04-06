@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import styles from './ProductModal.module.scss';
 
-const ProductModal = ({ product, onClose }) => {
+const ProductModal = ({ product, onClose, artisanInfo }) => {
   useEffect(() => {
     // Prevent scrolling when modal is open
     document.body.style.overflow = 'hidden';
@@ -11,6 +11,16 @@ const ProductModal = ({ product, onClose }) => {
   }, []);
 
   if (!product) return null;
+
+  const handleWhatsAppClick = () => {
+    const whatsappNumber = artisanInfo?.whatsapp || '5511999999999';
+    const message = encodeURIComponent(
+      `Olá! Eu quero a bolsa: ${product.name.toUpperCase()}\n` +
+      `Valor: ${product.price}\n\n` +
+      `Tenho algumas dúvidas sobre este modelo:`
+    );
+    window.open(`https://wa.me/${whatsappNumber}?text=${message}`, '_blank');
+  };
 
   return (
     <div className={styles.backdrop} onClick={onClose}>
@@ -33,12 +43,9 @@ const ProductModal = ({ product, onClose }) => {
           </p>
           <button 
             className={styles.buyButton}
-            onClick={() => {
-              const message = encodeURIComponent(`Olá! Gostaria de verificar a disponibilidade da bolsa: ${product.name}`);
-              window.open(`https://wa.me/5511999999999?text=${message}`, '_blank');
-            }}
+            onClick={handleWhatsAppClick}
           >
-            CHECK AVAILABILITY
+            EU QUERO
           </button>
         </div>
       </div>

@@ -216,6 +216,7 @@ function App() {
       {selectedProduct && (
         <ProductModal 
           product={selectedProduct} 
+          artisanInfo={aboutContent}
           onClose={() => setSelectedProduct(null)} 
         />
       )}
