@@ -115,6 +115,16 @@
   }
 }
 
+.buttonGroup {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1rem;
+
+  button {
+    flex: 1;
+  }
+}
+
 .submitButton {
   background-color: $color-text;
   color: white;
@@ -125,7 +135,6 @@
   letter-spacing: 0.3rem;
   cursor: pointer;
   transition: $transition-smooth;
-  margin-top: 1rem;
 
   &:hover {
     background-color: lighten($color-text, 10%);
@@ -136,6 +145,23 @@
     background-color: #ccc;
     cursor: not-allowed;
     transform: none;
+  }
+}
+
+.cancelButton {
+  background-color: transparent;
+  color: $color-text;
+  padding: 1.5rem;
+  border: 1px solid $color-border;
+  font-family: $font-sans;
+  font-size: 0.75rem;
+  letter-spacing: 0.3rem;
+  cursor: pointer;
+  transition: $transition-smooth;
+
+  &:hover {
+    background-color: $color-surface;
+    border-color: $color-text;
   }
 }
 

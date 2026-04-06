@@ -6,6 +6,8 @@ import About from './components/About/About';
 import Contact from './components/Contact/Contact';
 import ProductModal from './components/ProductModal/ProductModal';
 import AdminForm from './components/Admin/AdminForm';
+import AdminDashboard from './components/Admin/AdminDashboard';
+import AdminProductList from './components/Admin/AdminProductList';
 import { supabase } from './lib/supabase';
 
 function App() {
@@ -13,6 +15,7 @@ function App() {
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [loading, setLoading] = useState(true);
   const [isAdmin, setIsAdmin] = useState(false);
+  const [adminView, setAdminView] = useState('menu'); // 'menu', 'add', 'list'
 
   useEffect(() => {
     // Check if URL has ?admin=true
@@ -43,13 +46,16 @@ function App() {
 
   return (
     <div className="app">
-      <Header />
+      <Header isAdmin={isAdmin} onToggleAdmin={(val) => setIsAdmin(val)} />
       <main>
         {isAdmin ? (
           <section id="admin">
             <div style={{ textAlign: 'center', paddingTop: '4rem' }}>
               <button 
-                onClick={() => setIsAdmin(false)}
+                onClick={() => {
+                  setIsAdmin(false);
+                  window.history.pushState({}, '', window.location.pathname);
+                }}
                 style={{ 
                   background: 'none', 
                   border: '1px solid #ddd', 
@@ -62,7 +68,25 @@ function App() {
                 &larr; VOLTAR AO SITE
               </button>
             </div>
-            <AdminForm onProductAdded={fetchProducts} />
+            
+            {adminView === 'menu' && (
+              <AdminDashboard onViewChange={setAdminView} />
+            )}
+
+            {adminView === 'add' && (
+              <AdminForm 
+                onProductAdded={fetchProducts} 
+                onCancel={() => setAdminView('menu')} 
+              />
+            )}
+
+            {adminView === 'list' && (
+              <AdminProductList 
+                products={products} 
+                onRefresh={fetchProducts} 
+                onBack={() => setAdminView('menu')}
+              />
+            )}
           </section>
         ) : (
           <>

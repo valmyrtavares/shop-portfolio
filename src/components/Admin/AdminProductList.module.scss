@@ -1,0 +1,194 @@
+@use '../../styles/variables' as *;
+
+.listContainer {
+  padding: 6rem 1rem;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.header {
+  text-align: center;
+  margin-bottom: 5rem;
+
+  .label {
+    font-family: $font-sans;
+    font-size: 0.7rem;
+    letter-spacing: 0.3rem;
+    color: $color-text-muted;
+    margin-bottom: 1.5rem;
+    display: block;
+  }
+
+  .title {
+    font-size: 3rem;
+    font-family: $font-serif;
+    line-height: 1.1;
+    margin-bottom: 1.5rem;
+  }
+
+  .divider {
+    width: 40px;
+    height: 1px;
+    background-color: $color-text;
+    margin: 0 auto;
+  }
+}
+
+.tableWrapper {
+  background-color: $color-surface;
+  padding: 3rem;
+  border: 1px solid $color-border;
+  overflow-x: auto;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: $font-sans;
+  font-size: 0.8rem;
+  letter-spacing: 0.05rem;
+
+  th {
+    text-align: left;
+    padding: 1rem;
+    border-bottom: 1px solid $color-border;
+    color: $color-text-muted;
+    font-weight: 600;
+  }
+
+  td {
+    padding: 1.5rem 1rem;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  }
+}
+
+.actions {
+  display: flex;
+  gap: 1.5rem;
+
+  button {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    font-family: $font-sans;
+    font-size: 0.65rem;
+    letter-spacing: 0.15rem;
+    font-weight: 500;
+    transition: $transition-smooth;
+
+    &.editBtn {
+      color: $color-accent;
+      &:hover {
+        opacity: 0.7;
+      }
+    }
+
+    &.deleteBtn {
+      color: #721c24;
+      &:hover {
+        color: #f44336;
+      }
+    }
+  }
+}
+
+.modalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(10px);
+  z-index: 1000;
+  padding: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow-y: auto;
+}
+
+.modalContent {
+  width: 100%;
+  max-width: 650px;
+  background-color: white;
+  position: relative;
+  margin: auto;
+}
+
+.confirmModal {
+  background-color: white;
+  padding: 4rem;
+  max-width: 500px;
+  width: 100%;
+  text-align: center;
+
+  h3 {
+    margin-bottom: 2rem;
+    letter-spacing: 0.2rem;
+    font-size: 1.2rem;
+  }
+
+  p {
+    font-family: $font-sans;
+    font-size: 0.8rem;
+    line-height: 1.6;
+    margin-bottom: 3rem;
+    color: $color-text-muted;
+  }
+}
+
+.confirmActions {
+  display: flex;
+  gap: 1.5rem;
+
+  button {
+    flex: 1;
+    padding: 1rem;
+    font-family: $font-sans;
+    font-size: 0.7rem;
+    letter-spacing: 0.15rem;
+    border: none;
+    cursor: pointer;
+    transition: $transition-smooth;
+
+    &.confirmYes {
+      background-color: $color-text;
+      color: white;
+      &:hover {
+        opacity: 0.8;
+      }
+    }
+
+    &.confirmNo {
+      background-color: $color-surface;
+      color: $color-text;
+      border: 1px solid $color-border;
+      &:hover {
+        background-color: #eee;
+      }
+    }
+  }
+}
+
+.footer {
+  margin-top: 4rem;
+  text-align: center;
+}
+
+.backBtn {
+  background: transparent;
+  border: 1px solid $color-border;
+  padding: 0.8rem 1.5rem;
+  font-family: $font-sans;
+  font-size: 0.7rem;
+  letter-spacing: 0.2rem;
+  cursor: pointer;
+  transition: $transition-smooth;
+
+  &:hover {
+    background-color: $color-text;
+    color: white;
+    border-color: $color-text;
+  }
+}

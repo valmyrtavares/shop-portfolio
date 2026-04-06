@@ -74,6 +74,25 @@
             width: 100%;
           }
         }
+
+        &.adminLink {
+          opacity: 0.5;
+          font-size: 0.65rem;
+          margin-left: 1rem;
+          transition: opacity 0.3s ease;
+          
+          &:hover {
+            opacity: 1;
+          }
+          
+          &.active {
+            opacity: 1;
+            font-weight: 600;
+            &::after {
+              width: 100%;
+            }
+          }
+        }
       }
     }
   }

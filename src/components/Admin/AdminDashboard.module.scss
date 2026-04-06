@@ -1,0 +1,86 @@
+@use '../../styles/variables' as *;
+
+.dashboardContainer {
+  padding: 6rem 1rem;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.header {
+  text-align: center;
+  margin-bottom: 5rem;
+
+  .label {
+    font-family: $font-sans;
+    font-size: 0.7rem;
+    letter-spacing: 0.3rem;
+    color: $color-text-muted;
+    margin-bottom: 1.5rem;
+    display: block;
+  }
+
+  .title {
+    font-size: 3rem;
+    font-family: $font-serif;
+    line-height: 1.1;
+    margin-bottom: 1.5rem;
+  }
+
+  .divider {
+    width: 40px;
+    height: 1px;
+    background-color: $color-text;
+    margin: 0 auto;
+  }
+}
+
+.menuGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+
+  @media (max-width: 640px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.menuButton {
+  background-color: $color-surface;
+  border: 1px solid $color-border;
+  padding: 4rem 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2rem;
+  cursor: pointer;
+  transition: $transition-smooth;
+  text-align: center;
+
+  .buttonIcon {
+    font-size: 2.5rem;
+    font-weight: 300;
+    color: $color-text;
+    opacity: 0.5;
+    transition: $transition-smooth;
+  }
+
+  .buttonText {
+    font-family: $font-sans;
+    font-size: 0.75rem;
+    letter-spacing: 0.3rem;
+    font-weight: 500;
+  }
+
+  &:hover {
+    background-color: white;
+    border-color: $color-text;
+    transform: translateY(-5px);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.05);
+
+    .buttonIcon {
+      opacity: 1;
+      transform: scale(1.1);
+    }
+  }
+}
