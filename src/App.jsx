@@ -8,14 +8,17 @@ import ProductModal from './components/ProductModal/ProductModal';
 import AdminForm from './components/Admin/AdminForm';
 import AdminDashboard from './components/Admin/AdminDashboard';
 import AdminProductList from './components/Admin/AdminProductList';
+import AdminCategoryManager from './components/Admin/AdminCategoryManager';
 import { supabase } from './lib/supabase';
 
 function App() {
   const [products, setProducts] = useState([]);
+  const [categories, setCategories] = useState([]);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [loading, setLoading] = useState(true);
   const [isAdmin, setIsAdmin] = useState(false);
-  const [adminView, setAdminView] = useState('menu'); // 'menu', 'add', 'list'
+  const [adminView, setAdminView] = useState('menu'); // 'menu', 'add', 'list', 'categories'
+  const [activeCategory, setActiveCategory] = useState(null);
 
   useEffect(() => {
     // Check if URL has ?admin=true
@@ -24,12 +27,20 @@ function App() {
       setIsAdmin(true);
     }
 
-    fetchProducts();
+    fetchInitialData();
   }, []);
+
+  const fetchInitialData = async () => {
+    try {
+      setLoading(true);
+      await Promise.all([fetchProducts(), fetchCategories()]);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const fetchProducts = async () => {
     try {
-      setLoading(true);
       const { data, error } = await supabase
         .from('products')
         .select('*')
@@ -39,14 +50,40 @@ function App() {
       setProducts(data || []);
     } catch (error) {
       console.error('Error fetching products:', error.message);
-    } finally {
-      setLoading(false);
     }
   };
 
+  const fetchCategories = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('categories')
+        .select('*')
+        .order('name');
+      if (error) throw error;
+      setCategories(data || []);
+    } catch (error) {
+      console.error('Error fetching categories:', error.message);
+    }
+  };
+
+  const filteredProducts = activeCategory 
+    ? products.filter(p => p.category_id === activeCategory.id)
+    : products;
+
   return (
     <div className="app">
-      <Header isAdmin={isAdmin} onToggleAdmin={(val) => setIsAdmin(val)} />
+      <Header 
+        isAdmin={isAdmin} 
+        onToggleAdmin={(val) => setIsAdmin(val)} 
+        categories={categories}
+        onCategorySelect={(cat) => {
+          setActiveCategory(cat);
+          setAdminView('menu');
+          // Scroll to collection
+          const el = document.getElementById('collection');
+          if (el) el.scrollIntoView({ behavior: 'smooth' });
+        }}
+      />
       <main>
         {isAdmin ? (
           <section id="admin">
@@ -87,17 +124,37 @@ function App() {
                 onBack={() => setAdminView('menu')}
               />
             )}
+
+            {adminView === 'categories' && (
+              <AdminCategoryManager 
+                onBack={() => {
+                  setAdminView('menu');
+                  fetchCategories(); // Refresh categories in case they changed
+                }} 
+              />
+            )}
           </section>
         ) : (
           <>
             <Hero />
             <section id="collection">
+              {activeCategory && (
+                <div style={{ textAlign: 'center', padding: '4rem 0 0', fontFamily: 'serif' }}>
+                  <h2 style={{ fontSize: '1.2rem', letterSpacing: '0.2rem', opacity: 0.6 }}>{activeCategory.name.toUpperCase()}</h2>
+                  <button 
+                    onClick={() => setActiveCategory(null)}
+                    style={{ background: 'none', border: 'none', fontSize: '0.6rem', letterSpacing: '0.1rem', cursor: 'pointer', marginTop: '1rem', textDecoration: 'underline' }}
+                  >
+                    VER TODA A COLEÇÃO
+                  </button>
+                </div>
+              )}
               {loading ? (
                 <div style={{ textAlign: 'center', padding: '10rem 0', letterSpacing: '0.2rem', fontSize: '0.8rem', opacity: 0.5 }}>
-                  LOADING COLLECTION...
+                  LOADING...
                 </div>
               ) : (
-                <ProductGrid products={products} onProductClick={setSelectedProduct} />
+                <ProductGrid products={filteredProducts} onProductClick={setSelectedProduct} />
               )}
             </section>
             <About />
