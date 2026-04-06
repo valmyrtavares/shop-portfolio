@@ -34,6 +34,14 @@ const AdminDashboard = ({ onViewChange }) => {
           <span className={styles.buttonIcon}>🗂</span>
           <span className={styles.buttonText}>GERENCIAR CATEGORIAS</span>
         </button>
+
+        <button 
+          className={styles.menuButton} 
+          onClick={() => onViewChange('about')}
+        >
+          <span className={styles.buttonIcon}>👩‍🎨</span>
+          <span className={styles.buttonText}>GERENCIAR SOBRE</span>
+        </button>
       </div>
     </div>
   );

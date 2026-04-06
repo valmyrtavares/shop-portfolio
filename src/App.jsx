@@ -9,6 +9,7 @@ import AdminForm from './components/Admin/AdminForm';
 import AdminDashboard from './components/Admin/AdminDashboard';
 import AdminProductList from './components/Admin/AdminProductList';
 import AdminCategoryManager from './components/Admin/AdminCategoryManager';
+import AdminAboutManager from './components/Admin/AdminAboutManager';
 import { supabase } from './lib/supabase';
 
 function App() {
@@ -17,7 +18,7 @@ function App() {
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [loading, setLoading] = useState(true);
   const [isAdmin, setIsAdmin] = useState(false);
-  const [adminView, setAdminView] = useState('menu'); // 'menu', 'add', 'list', 'categories'
+  const [adminView, setAdminView] = useState('menu'); // 'menu', 'add', 'list', 'categories', 'about'
   const [activeCategory, setActiveCategory] = useState(null);
 
   useEffect(() => {
@@ -131,6 +132,12 @@ function App() {
                   setAdminView('menu');
                   fetchCategories(); // Refresh categories in case they changed
                 }} 
+              />
+            )}
+
+            {adminView === 'about' && (
+              <AdminAboutManager 
+                onBack={() => setAdminView('menu')}
               />
             )}
           </section>

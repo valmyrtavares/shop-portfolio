@@ -39,6 +39,32 @@
     margin-bottom: 2.5rem;
   }
 
+  .richText {
+    font-family: $font-sans;
+    font-size: 0.9rem;
+    line-height: 1.8;
+    letter-spacing: 0.05rem;
+    color: $color-text-muted;
+    text-transform: uppercase;
+
+    p {
+      margin-bottom: 1.5rem;
+    }
+
+    strong {
+      color: $color-text;
+      font-weight: 600;
+    }
+
+    h1, h2, h3 {
+      font-family: $font-serif;
+      color: $color-text;
+      margin: 2rem 0 1rem;
+      text-transform: uppercase;
+      letter-spacing: 0.2rem;
+    }
+  }
+
   .text {
     font-family: $font-sans;
     font-size: 0.85rem;

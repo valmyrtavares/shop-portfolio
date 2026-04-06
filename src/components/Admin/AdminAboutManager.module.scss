@@ -1,0 +1,191 @@
+@use '../../styles/variables' as *;
+
+.managerContainer {
+  padding: 6rem 1rem;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.header {
+  text-align: center;
+  margin-bottom: 5rem;
+
+  .label {
+    font-family: $font-sans;
+    font-size: 0.7rem;
+    letter-spacing: 0.3rem;
+    color: $color-text-muted;
+    margin-bottom: 1.5rem;
+    display: block;
+  }
+
+  .title {
+    font-size: 3rem;
+    font-family: $font-serif;
+    line-height: 1.1;
+    margin-bottom: 1.5rem;
+  }
+
+  .divider {
+    width: 40px;
+    height: 1px;
+    background-color: $color-text;
+    margin: 0 auto;
+  }
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 2.5rem;
+  background-color: $color-surface;
+  padding: 4rem;
+  border: 1px solid $color-border;
+}
+
+.inputGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+
+  label {
+    font-family: $font-sans;
+    font-size: 0.65rem;
+    letter-spacing: 0.2rem;
+    color: $color-text-muted;
+    font-weight: 500;
+  }
+
+  input[type="text"] {
+    background: transparent;
+    border: none;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+    padding: 0.8rem 0;
+    font-family: $font-sans;
+    font-size: 0.9rem;
+    letter-spacing: 0.05rem;
+    outline: none;
+    transition: border-color 0.3s ease;
+
+    &:focus {
+      border-bottom-color: $color-text;
+    }
+  }
+
+  input[type="file"] {
+    border-bottom: none;
+    cursor: pointer;
+    font-size: 0.7rem;
+    
+    &::file-selector-button {
+      background-color: transparent;
+      border: 1px solid $color-border;
+      padding: 0.5rem 1rem;
+      font-family: $font-sans;
+      font-size: 0.6rem;
+      letter-spacing: 0.15rem;
+      cursor: pointer;
+      margin-right: 1.5rem;
+      transition: $transition-smooth;
+
+      &:hover {
+        background-color: $color-text;
+        color: white;
+      }
+    }
+  }
+  textarea {
+    background: transparent;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    padding: 1rem;
+    font-family: $font-sans;
+    font-size: 0.9rem;
+    line-height: 1.6;
+    outline: none;
+    transition: border-color 0.3s ease;
+    resize: vertical;
+
+    &:focus {
+      border-color: $color-text;
+    }
+  }
+}
+
+.currentImage {
+  width: 100px;
+  height: 100px;
+  margin-bottom: 1rem;
+  border: 1px solid $color-border;
+  overflow: hidden;
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+}
+
+.buttonGroup {
+  display: flex;
+  gap: 1.5rem;
+  margin-top: 1rem;
+
+  button {
+    flex: 1;
+    padding: 1.5rem;
+    font-family: $font-sans;
+    font-size: 0.75rem;
+    letter-spacing: 0.3rem;
+    cursor: pointer;
+    transition: $transition-smooth;
+  }
+}
+
+.submitButton {
+  background-color: $color-text;
+  color: white;
+  border: none;
+
+  &:hover {
+    background-color: lighten($color-text, 10%);
+    transform: translateY(-2px);
+  }
+
+  &:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+    transform: none;
+  }
+}
+
+.cancelButton {
+  background-color: transparent;
+  color: $color-text;
+  border: 1px solid $color-border;
+
+  &:hover {
+    background-color: white;
+    border-color: $color-text;
+  }
+}
+
+.message {
+  padding: 1rem;
+  text-align: center;
+  font-family: $font-sans;
+  font-size: 0.7rem;
+  letter-spacing: 0.1rem;
+  margin-top: 1.5rem;
+
+  &.success {
+    background-color: #f0fdf4;
+    color: #166534;
+    border: 1px solid #bbf7d0;
+  }
+
+  &.error {
+    background-color: #fef2f2;
+    color: #991b1b;
+    border: 1px solid #fecaca;
+  }
+}
