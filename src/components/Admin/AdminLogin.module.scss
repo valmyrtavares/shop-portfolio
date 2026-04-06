@@ -1,0 +1,110 @@
+@import '../../styles/variables';
+
+.loginContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 60vh;
+  padding: 2rem;
+  animation: fadeIn 0.4s ease;
+}
+
+.loginCard {
+  width: 100%;
+  max-width: 400px;
+  background-color: white;
+  padding: 3rem;
+  border: 1px solid $color-border;
+  text-align: center;
+}
+
+.header {
+  margin-bottom: 2rem;
+  
+  .label {
+    display: block;
+    font-family: $font-sans;
+    font-size: 0.6rem;
+    letter-spacing: 0.2rem;
+    color: rgba(0, 0, 0, 0.4);
+    margin-bottom: 0.8rem;
+  }
+  
+  h2 {
+    font-family: $font-serif;
+    font-size: 1.4rem;
+    letter-spacing: 0.1rem;
+    font-weight: 400;
+  }
+  
+  .divider {
+    width: 30px;
+    height: 1px;
+    background-color: $color-text;
+    margin: 1.5rem auto;
+  }
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.inputGroup {
+  text-align: left;
+  
+  label {
+    display: block;
+    font-family: $font-sans;
+    font-size: 0.6rem;
+    letter-spacing: 0.1rem;
+    margin-bottom: 0.5rem;
+    opacity: 0.6;
+  }
+  
+  input {
+    width: 100%;
+    border: none;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+    padding: 0.8rem 0;
+    font-family: $font-sans;
+    font-size: 0.9rem;
+    outline: none;
+    transition: border-color 0.3s ease;
+    
+    &:focus {
+      border-color: $color-text;
+    }
+  }
+}
+
+.loginButton {
+  margin-top: 1rem;
+  padding: 1rem;
+  background-color: $color-text;
+  color: white;
+  border: none;
+  font-family: $font-sans;
+  font-size: 0.7rem;
+  letter-spacing: 0.2rem;
+  cursor: pointer;
+  transition: opacity 0.3s ease;
+  
+  &:hover {
+    opacity: 0.9;
+  }
+}
+
+.errorMessage {
+  margin-top: 1rem;
+  font-family: $font-sans;
+  font-size: 0.6rem;
+  color: #ff4d4d;
+  letter-spacing: 0.1rem;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}

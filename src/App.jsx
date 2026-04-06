@@ -10,6 +10,7 @@ import AdminDashboard from './components/Admin/AdminDashboard';
 import AdminProductList from './components/Admin/AdminProductList';
 import AdminCategoryManager from './components/Admin/AdminCategoryManager';
 import AdminAboutManager from './components/Admin/AdminAboutManager';
+import AdminLogin from './components/Admin/AdminLogin';
 import FeaturedCarousel from './components/FeaturedCarousel/FeaturedCarousel';
 import { supabase } from './lib/supabase';
 
@@ -21,6 +22,9 @@ function App() {
   const [isCarouselOpen, setIsCarouselOpen] = useState(false);
   const [loading, setLoading] = useState(true);
   const [isAdmin, setIsAdmin] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(
+    sessionStorage.getItem('admin_authenticated') === 'true'
+  );
   const [adminView, setAdminView] = useState('menu'); // 'menu', 'add', 'list', 'categories', 'about'
   const [activeCategory, setActiveCategory] = useState(null);
 
@@ -33,6 +37,18 @@ function App() {
 
     fetchInitialData();
   }, []);
+
+  const handleLogin = () => {
+    setIsAuthenticated(true);
+    sessionStorage.setItem('admin_authenticated', 'true');
+  };
+
+  const handleLogout = () => {
+    setIsAuthenticated(false);
+    sessionStorage.removeItem('admin_authenticated');
+    setIsAdmin(false);
+    window.history.pushState({}, '', window.location.pathname);
+  };
 
   const fetchInitialData = async () => {
     try {
@@ -91,7 +107,7 @@ function App() {
   return (
     <div className="app">
       <Header 
-        isAdmin={isAdmin} 
+        isAdmin={isAdmin && isAuthenticated} 
         onToggleAdmin={(val) => setIsAdmin(val)} 
         categories={categories}
         onCategorySelect={(cat) => {
@@ -106,60 +122,81 @@ function App() {
       <main>
         {isAdmin ? (
           <section id="admin">
-            <div style={{ textAlign: 'center', paddingTop: '4rem' }}>
-              <button 
-                onClick={() => {
-                  setIsAdmin(false);
-                  window.history.pushState({}, '', window.location.pathname);
-                }}
-                style={{ 
-                  background: 'none', 
-                  border: '1px solid #ddd', 
-                  padding: '0.5rem 1rem', 
-                  fontSize: '0.6rem', 
-                  letterSpacing: '0.1rem',
-                  cursor: 'pointer'
-                }}
-              >
-                &larr; VOLTAR AO SITE
-              </button>
-            </div>
-            
-            {adminView === 'menu' && (
-              <AdminDashboard onViewChange={setAdminView} />
-            )}
+            {!isAuthenticated ? (
+              <AdminLogin onLogin={handleLogin} />
+            ) : (
+              <>
+                <div style={{ display: 'flex', justifyContent: 'center', gap: '1rem', paddingTop: '4rem' }}>
+                  <button 
+                    onClick={() => {
+                      setIsAdmin(false);
+                      window.history.pushState({}, '', window.location.pathname);
+                    }}
+                    style={{ 
+                      background: 'none', 
+                      border: '1px solid #ddd', 
+                      padding: '0.5rem 1rem', 
+                      fontSize: '0.6rem', 
+                      letterSpacing: '0.1rem',
+                      cursor: 'pointer'
+                    }}
+                  >
+                    &larr; VOLTAR AO SITE
+                  </button>
 
-            {adminView === 'add' && (
-              <AdminForm 
-                onProductAdded={fetchProducts} 
-                onCancel={() => setAdminView('menu')} 
-              />
-            )}
+                  <button 
+                    onClick={handleLogout}
+                    style={{ 
+                      background: 'none', 
+                      border: '1px solid #ff4d4d', 
+                      color: '#ff4d4d',
+                      padding: '0.5rem 1rem', 
+                      fontSize: '0.6rem', 
+                      letterSpacing: '0.1rem',
+                      cursor: 'pointer'
+                    }}
+                  >
+                    SAIR (LOGOUT)
+                  </button>
+                </div>
+                
+                {adminView === 'menu' && (
+                  <AdminDashboard onViewChange={setAdminView} />
+                )}
 
-            {adminView === 'list' && (
-              <AdminProductList 
-                products={products} 
-                onRefresh={fetchProducts} 
-                onBack={() => setAdminView('menu')}
-              />
-            )}
+                {adminView === 'add' && (
+                  <AdminForm 
+                    onProductAdded={fetchProducts} 
+                    onCancel={() => setAdminView('menu')} 
+                  />
+                )}
 
-            {adminView === 'categories' && (
-              <AdminCategoryManager 
-                onBack={() => {
-                  setAdminView('menu');
-                  fetchCategories(); // Refresh categories in case they changed
-                }} 
-              />
-            )}
+                {adminView === 'list' && (
+                  <AdminProductList 
+                    products={products} 
+                    onRefresh={fetchProducts} 
+                    onBack={() => setAdminView('menu')}
+                  />
+                )}
 
-            {adminView === 'about' && (
-              <AdminAboutManager 
-                onBack={() => {
-                  setAdminView('menu');
-                  fetchInitialData();
-                }}
-              />
+                {adminView === 'categories' && (
+                  <AdminCategoryManager 
+                    onBack={() => {
+                      setAdminView('menu');
+                      fetchCategories(); // Refresh categories in case they changed
+                    }} 
+                  />
+                )}
+
+                {adminView === 'about' && (
+                  <AdminAboutManager 
+                    onBack={() => {
+                      setAdminView('menu');
+                      fetchInitialData();
+                    }}
+                  />
+                )}
+              </>
             )}
           </section>
         ) : (
