@@ -1,7 +1,14 @@
-import React from 'react';
+import React, { useState } from 'react';
 import styles from './Header.module.scss';
 
 const Header = ({ isAdmin, onToggleAdmin, categories, onCategorySelect, onCarouselOpen }) => {
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+
+  const handleCategoryClick = (cat, shouldFilter) => {
+    onCategorySelect(cat, shouldFilter);
+    setIsDropdownOpen(false); // Close menu on selection
+  };
+
   return (
     <header className={styles.header}>
       <div className={styles.container}>
@@ -11,20 +18,32 @@ const Header = ({ isAdmin, onToggleAdmin, categories, onCategorySelect, onCarous
         </div>
         <nav className={styles.nav}>
           <ul>
-            <li className={styles.hasDropdown}>
-              <a href="#collection" onClick={() => { onToggleAdmin(false); onCategorySelect(null, false); }}>
+            <li 
+              className={`${styles.hasDropdown} ${isDropdownOpen ? styles.open : ''}`}
+              onMouseEnter={() => setIsDropdownOpen(true)}
+              onMouseLeave={() => setIsDropdownOpen(false)}
+            >
+              <a 
+                href="#collection" 
+                onClick={(e) => { 
+                  e.preventDefault();
+                  setIsDropdownOpen(!isDropdownOpen); // Toggle on main click for mobile
+                  onToggleAdmin(false); 
+                  onCategorySelect(null, false); 
+                }}
+              >
                 COLEÇÃO
               </a>
               {categories && categories.length > 0 && (
-                <ul className={styles.dropdown}>
+                <ul className={`${styles.dropdown} ${isDropdownOpen ? styles.show : ''}`}>
                   <li key="all">
-                    <a href="#collection" onClick={(e) => { e.preventDefault(); onCategorySelect(null, true); }}>
+                    <a href="#collection" onClick={(e) => { e.preventDefault(); handleCategoryClick(null, true); }}>
                       VER TUDO
                     </a>
                   </li>
                   {categories.map(cat => (
                     <li key={cat.id}>
-                      <a href="#collection" onClick={(e) => { e.preventDefault(); onCategorySelect(cat, true); }}>
+                      <a href="#collection" onClick={(e) => { e.preventDefault(); handleCategoryClick(cat, true); }}>
                         {cat.name.toUpperCase()}
                       </a>
                     </li>
