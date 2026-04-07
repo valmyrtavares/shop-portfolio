@@ -48,12 +48,20 @@
       position: relative;
 
       &.hasDropdown {
-        &:hover {
-          .dropdown {
+        // Desktop hover
+        &:hover .dropdown {
+          @media (min-width: 769px) {
             opacity: 1;
             visibility: visible;
-            transform: translateY(0);
+            transform: translateX(-50%) translateY(0);
           }
+        }
+
+        // State-driven visibility (Mobile & Backup for Desktop)
+        &.open .dropdown {
+          opacity: 1;
+          visibility: visible;
+          transform: translateX(-50%) translateY(0);
         }
       }
 

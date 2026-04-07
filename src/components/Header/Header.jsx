@@ -1,12 +1,24 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import styles from './Header.module.scss';
 
 const Header = ({ isAdmin, onToggleAdmin, categories, onCategorySelect, onCarouselOpen }) => {
+  const menuRef = useRef(null);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (menuRef.current && !menuRef.current.contains(event.target)) {
+        setIsDropdownOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   const handleCategoryClick = (cat, shouldFilter) => {
     onCategorySelect(cat, shouldFilter);
-    setIsDropdownOpen(false); // Close menu on selection
+    setIsDropdownOpen(false);
   };
 
   return (
@@ -19,9 +31,10 @@ const Header = ({ isAdmin, onToggleAdmin, categories, onCategorySelect, onCarous
         <nav className={styles.nav}>
           <ul>
             <li 
+              ref={menuRef}
               className={`${styles.hasDropdown} ${isDropdownOpen ? styles.open : ''}`}
-              onMouseEnter={() => setIsDropdownOpen(true)}
-              onMouseLeave={() => setIsDropdownOpen(false)}
+              onMouseEnter={() => window.innerWidth > 768 && setIsDropdownOpen(true)}
+              onMouseLeave={() => window.innerWidth > 768 && setIsDropdownOpen(false)}
             >
               <a 
                 href="#collection" 
