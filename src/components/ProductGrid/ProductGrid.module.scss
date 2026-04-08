@@ -19,13 +19,18 @@
 @media (max-width: 768px) {
   .gridSection {
     padding: 2rem 0 6rem;
+    width: 100%;
+    overflow: hidden; // prevent horizontal layout breaks
   }
   
   .container {
     padding: 0; // Remove container padding to let carousel span full width or handle internally
+    width: 100%;
   }
 
   .mobileCarousel {
+    width: 100%;
+    display: block; // Ensure it behaves as a block
     padding: 0 1.5rem 2rem; // Side padding so the first/last items aren't touching edges
     overflow: visible !important; // Essential for showing partial next slide
     
