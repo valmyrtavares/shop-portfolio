@@ -27,6 +27,65 @@ function App() {
   );
   const [adminView, setAdminView] = useState('menu'); // 'menu', 'add', 'list', 'categories', 'about'
   const [activeCategory, setActiveCategory] = useState(null);
+  const [initialCheckDone, setInitialCheckDone] = useState(false);
+
+  // Initial deep link check once products are loaded
+  useEffect(() => {
+    if (products.length > 0 && !initialCheckDone) {
+      const params = new URLSearchParams(window.location.search);
+      const productId = params.get('product');
+      if (productId) {
+        const product = products.find(p => String(p.id) === String(productId));
+        if (product) {
+          setSelectedProduct(product);
+        }
+      }
+      setInitialCheckDone(true);
+    }
+  }, [products, initialCheckDone]);
+
+  // Sync URL with selectedProduct state
+  useEffect(() => {
+    if (!initialCheckDone) return;
+
+    const params = new URLSearchParams(window.location.search);
+    const currentIdInUrl = params.get('product');
+    
+    if (selectedProduct) {
+      // If product selected and NOT in URL, push state
+      if (currentIdInUrl !== String(selectedProduct.id)) {
+        params.set('product', selectedProduct.id);
+        const newUrl = `${window.location.pathname}?${params.toString()}${window.location.hash}`;
+        window.history.pushState({ type: 'product', id: selectedProduct.id }, '', newUrl);
+      }
+    } else {
+      // If NO product selected but ID IS in URL, remove it
+      if (currentIdInUrl) {
+        params.delete('product');
+        const search = params.toString();
+        const newUrl = `${window.location.pathname}${search ? '?' + search : ''}${window.location.hash}`;
+        window.history.pushState({ type: 'product', id: null }, '', newUrl);
+      }
+    }
+  }, [selectedProduct, initialCheckDone]);
+
+  // Handle browser back/forward navigation
+  useEffect(() => {
+    const handlePopState = () => {
+      const params = new URLSearchParams(window.location.search);
+      const productId = params.get('product');
+      
+      if (productId) {
+        const product = products.find(p => String(p.id) === String(productId));
+        setSelectedProduct(product || null);
+      } else {
+        setSelectedProduct(null);
+      }
+    };
+
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, [products]);
 
   useEffect(() => {
     // Check if URL has ?admin=true
