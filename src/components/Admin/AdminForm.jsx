@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../../lib/supabase';
+import { resizeImage } from '../../lib/imageUtils';
 import styles from './AdminForm.module.scss';
 
 const AdminForm = ({ onProductAdded, productToEdit, onCancel }) => {
@@ -65,13 +66,16 @@ const AdminForm = ({ onProductAdded, productToEdit, onCancel }) => {
 
       // 1. Upload new image if provided
       if (imageFile) {
-        const fileExt = imageFile.name.split('.').pop();
+        // Resize image to max 500px before uploading
+        const compressedFile = await resizeImage(imageFile, 500, 0.8);
+        
+        const fileExt = compressedFile.name.split('.').pop();
         const fileName = `${Math.random()}.${fileExt}`;
         const filePath = `${fileName}`;
 
         const { error: uploadError } = await supabase.storage
           .from('product-images')
-          .upload(filePath, imageFile);
+          .upload(filePath, compressedFile);
 
         if (uploadError) throw uploadError;
 

@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import styles from './Header.module.scss';
 
-const Header = ({ isAdmin, onToggleAdmin, categories, onCategorySelect, onCarouselOpen }) => {
+const Header = ({ isAdmin, onToggleAdmin, categories, onCategorySelect, onCarouselOpen, settings }) => {
   const menuRef = useRef(null);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
@@ -25,8 +25,25 @@ const Header = ({ isAdmin, onToggleAdmin, categories, onCategorySelect, onCarous
     <header className={styles.header}>
       <div className={styles.container}>
         <div className={styles.logo}>
-          <h1>VALERIA MONIS</h1>
-          <p>HANDMADE BAGS</p>
+          {settings?.logo_url ? (
+            <img 
+              src={settings.logo_url} 
+              alt={settings.header_title || 'Logo'} 
+              style={{ 
+                width: '100%', 
+                maxWidth: '350px', 
+                height: 'auto', 
+                objectFit: 'contain',
+                display: 'block',
+                margin: '0 auto'
+              }} 
+            />
+          ) : (
+            <>
+              <h1>{settings?.header_title || 'VALERIA MONIS'}</h1>
+              <p>{settings?.header_subtitle || 'HANDMADE BAGS'}</p>
+            </>
+          )}
         </div>
         <nav className={styles.nav}>
           <ul>

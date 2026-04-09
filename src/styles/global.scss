@@ -8,11 +8,12 @@
 
 body {
   font-family: $font-sans;
-  background-color: $color-bg;
-  color: $color-text;
+  background-color: var(--bg-color, #{$color-bg});
+  color: var(--text-color, #{$color-text});
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   line-height: 1.5;
+  transition: background-color 0.5s ease-in-out, color 0.5s ease-in-out;
 }
 
 h1, h2, h3, h4, h5, h6 {

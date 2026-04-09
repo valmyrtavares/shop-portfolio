@@ -11,6 +11,7 @@ import AdminProductList from './components/Admin/AdminProductList';
 import AdminCategoryManager from './components/Admin/AdminCategoryManager';
 import AdminAboutManager from './components/Admin/AdminAboutManager';
 import AdminLogin from './components/Admin/AdminLogin';
+import AdminSiteSettings from './components/Admin/AdminSiteSettings';
 import FeaturedCarousel from './components/FeaturedCarousel/FeaturedCarousel';
 import { supabase } from './lib/supabase';
 
@@ -18,6 +19,7 @@ function App() {
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
   const [aboutContent, setAboutContent] = useState(null);
+  const [siteSettings, setSiteSettings] = useState(null);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [isCarouselOpen, setIsCarouselOpen] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -87,6 +89,41 @@ function App() {
     return () => window.removeEventListener('popstate', handlePopState);
   }, [products]);
 
+  const fetchSiteSettings = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('site_settings')
+        .select('*')
+        .single();
+      
+      if (error && error.code !== 'PGRST116') throw error;
+      if (data) setSiteSettings(data);
+    } catch (error) {
+      console.error('Error fetching site settings:', error.message);
+    }
+  };
+
+  // Apply site settings (colors)
+  useEffect(() => {
+    if (siteSettings?.bg_color) {
+      const hex = siteSettings.bg_color.replace('#', '');
+      const r = parseInt(hex.substr(0, 2), 16);
+      const g = parseInt(hex.substr(2, 2), 16);
+      const b = parseInt(hex.substr(4, 2), 16);
+      const luminance = (0.2126 * r + 0.7152 * g + 0.0722 * b) / 255;
+      
+      const isLight = luminance > 0.5;
+      const textColor = isLight ? '#1a1a1a' : '#ffffff';
+      const mutedColor = isLight ? '#666666' : 'rgba(255, 255, 255, 0.7)';
+      const borderColor = isLight ? '#eeeeee' : 'rgba(255, 255, 255, 0.1)';
+
+      document.documentElement.style.setProperty('--bg-color', siteSettings.bg_color);
+      document.documentElement.style.setProperty('--text-color', textColor);
+      document.documentElement.style.setProperty('--text-muted-color', mutedColor);
+      document.documentElement.style.setProperty('--border-color', borderColor);
+    }
+  }, [siteSettings]);
+
   useEffect(() => {
     // Check if URL has ?admin=true
     const params = new URLSearchParams(window.location.search);
@@ -112,7 +149,12 @@ function App() {
   const fetchInitialData = async () => {
     try {
       setLoading(true);
-      await Promise.all([fetchProducts(), fetchCategories(), fetchAboutContent()]);
+      await Promise.all([
+        fetchProducts(), 
+        fetchCategories(), 
+        fetchAboutContent(),
+        fetchSiteSettings()
+      ]);
     } finally {
       setLoading(false);
     }
@@ -169,6 +211,7 @@ function App() {
         isAdmin={isAdmin && isAuthenticated} 
         onToggleAdmin={(val) => setIsAdmin(val)} 
         categories={categories}
+        settings={siteSettings}
         onCategorySelect={(cat, shouldScroll = true) => {
           setActiveCategory(cat);
           setAdminView('menu');
@@ -257,12 +300,21 @@ function App() {
                     }}
                   />
                 )}
+
+                {adminView === 'settings' && (
+                  <AdminSiteSettings 
+                    onBack={() => {
+                      setAdminView('menu');
+                      fetchSiteSettings();
+                    }}
+                  />
+                )}
               </>
             )}
           </section>
         ) : (
           <>
-            <Hero />
+            <Hero settings={siteSettings} />
             <section id="collection">
               {activeCategory && (
                 <div style={{ textAlign: 'center', padding: '4rem 0 0', fontFamily: 'serif' }}>
