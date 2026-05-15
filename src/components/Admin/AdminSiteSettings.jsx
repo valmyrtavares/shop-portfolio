@@ -10,7 +10,8 @@ const AdminSiteSettings = ({ onBack }) => {
     hero_title: '',
     hero_subtitle: '',
     logo_url: '',
-    bg_color: '#ffffff'
+    bg_color: '#ffffff',
+    secondary_bg_color: '#ffffff'
   });
   const [imageFile, setImageFile] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -35,7 +36,8 @@ const AdminSiteSettings = ({ onBack }) => {
           hero_title: data.hero_title || '',
           hero_subtitle: data.hero_subtitle || '',
           logo_url: data.logo_url || '',
-          bg_color: data.bg_color || '#ffffff'
+          bg_color: data.bg_color || '#ffffff',
+          secondary_bg_color: data.secondary_bg_color || '#ffffff'
         });
       }
     } catch (error) {
@@ -191,7 +193,7 @@ const AdminSiteSettings = ({ onBack }) => {
         <h3 className={styles.sectionSubtitle}>CORES E ESTILO</h3>
 
         <div className={styles.inputGroup}>
-          <label>COR DE FUNDO DO SITE</label>
+          <label>COR DE FUNDO PRINCIPAL (PRODUTOS)</label>
           <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
             <input 
               type="color" 
@@ -202,7 +204,21 @@ const AdminSiteSettings = ({ onBack }) => {
             />
             <span style={{ fontSize: '0.8rem', opacity: 0.6 }}>{formData.bg_color.toUpperCase()}</span>
           </div>
-          <p style={{ fontSize: '0.6rem', marginTop: '0.5rem', opacity: 0.5 }}>DICA: AS CORES DOS TEXTOS SERÃO AJUSTADAS AUTOMATICAMENTE PARA GARANTIR CONTRASTE.</p>
+        </div>
+
+        <div className={styles.inputGroup}>
+          <label>COR DE FUNDO SECUNDÁRIA (RESTANTE DO SITE)</label>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+            <input 
+              type="color" 
+              name="secondary_bg_color" 
+              value={formData.secondary_bg_color} 
+              onChange={handleInputChange} 
+              style={{ width: '100px', height: '50px', border: 'none', cursor: 'pointer' }}
+            />
+            <span style={{ fontSize: '0.8rem', opacity: 0.6 }}>{formData.secondary_bg_color.toUpperCase()}</span>
+          </div>
+          <p style={{ fontSize: '0.6rem', marginTop: '0.5rem', opacity: 0.5 }}>DICA: ESTA COR AFETA O HEADER, HERO, SOBRE, CONTATO E RODAPÉ.</p>
         </div>
 
         <div className={styles.buttonGroup}>

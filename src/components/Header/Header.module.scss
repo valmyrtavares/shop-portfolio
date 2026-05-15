@@ -3,7 +3,8 @@
 .header {
   width: 100%;
   padding: 4rem 0 2rem;
-  background-color: $color-bg;
+  background-color: var(--secondary-bg-color, #{$color-bg});
+  color: var(--secondary-text-color, #{$color-text});
   border-bottom: 1px solid transparent;
   
   .container {
@@ -25,7 +26,7 @@
     letter-spacing: 0.3rem;
     font-weight: 300;
     margin-bottom: 0.5rem;
-    color: $color-text;
+    color: var(--secondary-text-color, #{$color-text});
     text-transform: uppercase;
   }
   
@@ -34,7 +35,7 @@
     font-size: 0.7rem;
     letter-spacing: 0.4rem;
     font-weight: 300;
-    color: $color-text-muted;
+    color: var(--secondary-text-muted-color, #{$color-text-muted});
     text-transform: uppercase;
   }
 }
@@ -70,7 +71,7 @@
         font-size: 0.75rem;
         font-weight: 400;
         letter-spacing: 0.15rem;
-        color: $color-text;
+        color: var(--secondary-text-color, #{$color-text});
         text-transform: uppercase;
         position: relative;
         padding-bottom: 2rem;
@@ -82,7 +83,7 @@
           left: 50%;
           width: 0;
           height: 1px;
-          background-color: $color-text;
+          background-color: var(--secondary-text-color, #{$color-text});
           transition: $transition-smooth;
           transform: translateX(-50%);
         }
@@ -104,7 +105,7 @@
   top: 100%;
   left: 50%;
   transform: translateX(-50%) translateY(10px);
-  background-color: white;
+  background-color: var(--secondary-bg-color, white);
   min-width: 200px;
   padding: 2rem 0;
   display: flex;
@@ -115,7 +116,7 @@
   transition: $transition-smooth;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
   z-index: 100;
-  border: 1px solid $color-border;
+  border: 1px solid var(--secondary-border-color, #{$color-border});
   margin-top: -1.5rem;
 
   &.show {
@@ -131,7 +132,7 @@
       padding: 0.5rem 1rem !important;
       font-size: 0.6rem !important;
       letter-spacing: 0.2rem !important;
-      color: $color-text-muted !important;
+      color: var(--secondary-text-muted-color, #{$color-text-muted}) !important;
       display: block;
       transition: color 0.3s ease;
 
@@ -140,7 +141,7 @@
       }
 
       &:hover {
-        color: $color-text !important;
+        color: var(--secondary-text-color, #{$color-text}) !important;
       }
     }
   }

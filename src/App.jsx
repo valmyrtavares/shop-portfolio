@@ -106,6 +106,7 @@ function App() {
   // Apply site settings (colors)
   useEffect(() => {
     if (siteSettings?.bg_color) {
+      // Main BG
       const hex = siteSettings.bg_color.replace('#', '');
       const r = parseInt(hex.substr(0, 2), 16);
       const g = parseInt(hex.substr(2, 2), 16);
@@ -121,6 +122,25 @@ function App() {
       document.documentElement.style.setProperty('--text-color', textColor);
       document.documentElement.style.setProperty('--text-muted-color', mutedColor);
       document.documentElement.style.setProperty('--border-color', borderColor);
+    }
+
+    if (siteSettings?.secondary_bg_color) {
+      // Secondary BG
+      const hex = siteSettings.secondary_bg_color.replace('#', '');
+      const r = parseInt(hex.substr(0, 2), 16);
+      const g = parseInt(hex.substr(2, 2), 16);
+      const b = parseInt(hex.substr(4, 2), 16);
+      const luminance = (0.2126 * r + 0.7152 * g + 0.0722 * b) / 255;
+      
+      const isLight = luminance > 0.5;
+      const textColor = isLight ? '#1a1a1a' : '#ffffff';
+      const mutedColor = isLight ? '#666666' : 'rgba(255, 255, 255, 0.7)';
+      const borderColor = isLight ? '#eeeeee' : 'rgba(255, 255, 255, 0.1)';
+
+      document.documentElement.style.setProperty('--secondary-bg-color', siteSettings.secondary_bg_color);
+      document.documentElement.style.setProperty('--secondary-text-color', textColor);
+      document.documentElement.style.setProperty('--secondary-text-muted-color', mutedColor);
+      document.documentElement.style.setProperty('--secondary-border-color', borderColor);
     }
   }, [siteSettings]);
 
@@ -340,7 +360,13 @@ function App() {
           </>
         )}
       </main>
-      <footer style={{ textAlign: 'center', padding: '6rem 0', background: '#f9f9f9', letterSpacing: '0.1rem' }}>
+      <footer style={{ 
+        textAlign: 'center', 
+        padding: '6rem 0', 
+        background: 'var(--secondary-bg-color, #f9f9f9)', 
+        color: 'var(--secondary-text-color, #1a1a1a)',
+        letterSpacing: '0.1rem' 
+      }}>
         <p style={{ fontSize: '0.7rem', opacity: 0.6 }}>&copy; 2026 {aboutContent?.title?.toUpperCase() || 'VALERIA MONIS'} HANDMADE. ALL RIGHTS RESERVED.</p>
         <div style={{ marginTop: '1.5rem', display: 'flex', justifyContent: 'center', gap: '2rem', fontSize: '0.6rem', fontWeight: 500 }}>
           {aboutContent?.instagram && (

@@ -2,7 +2,8 @@
 
 .about {
   padding: 10rem 0;
-  background-color: $color-surface;
+  background-color: var(--secondary-bg-color, #{$color-surface});
+  color: var(--secondary-text-color, #{$color-text});
 
   .container {
     max-width: $max-width;
@@ -21,7 +22,7 @@
     font-family: $font-sans;
     font-size: 0.7rem;
     letter-spacing: 0.3rem;
-    color: $color-text-muted;
+    color: var(--secondary-text-muted-color, #{$color-text-muted});
     margin-bottom: 1.5rem;
     display: block;
   }
@@ -35,7 +36,7 @@
   .divider {
     width: 60px;
     height: 1px;
-    background-color: $color-text;
+    background-color: var(--secondary-text-color, #{$color-text});
     margin-bottom: 2.5rem;
   }
 
@@ -44,7 +45,7 @@
     font-size: 0.9rem;
     line-height: 1.8;
     letter-spacing: 0.05rem;
-    color: $color-text-muted;
+    color: var(--secondary-text-muted-color, #{$color-text-muted});
     text-transform: uppercase;
 
     p {
@@ -52,13 +53,13 @@
     }
 
     strong {
-      color: $color-text;
+      color: var(--secondary-text-color, #{$color-text});
       font-weight: 600;
     }
 
     h1, h2, h3 {
       font-family: $font-serif;
-      color: $color-text;
+      color: var(--secondary-text-color, #{$color-text});
       margin: 2rem 0 1rem;
       text-transform: uppercase;
       letter-spacing: 0.2rem;
@@ -69,7 +70,7 @@
     font-family: $font-sans;
     font-size: 0.85rem;
     line-height: 2;
-    color: $color-text-muted;
+    color: var(--secondary-text-muted-color, #{$color-text-muted});
     letter-spacing: 0.05rem;
     margin-bottom: 1.5rem;
     max-width: 500px;

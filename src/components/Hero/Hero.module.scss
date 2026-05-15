@@ -7,14 +7,14 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: $color-bg;
+  background-color: var(--secondary-bg-color, #{$color-bg});
   overflow: hidden;
 
   .content {
     position: relative;
     z-index: 1;
     text-align: center;
-    color: $color-text;
+    color: var(--secondary-text-color, #{$color-text});
     padding: 2rem;
   }
 
@@ -38,8 +38,8 @@
   }
 
   .cta {
-    background: $color-text;
-    color: white;
+    background: var(--secondary-text-color, #{$color-text});
+    color: var(--secondary-bg-color, white);
     border: none;
     padding: 1.2rem 2.8rem;
     font-family: $font-sans;

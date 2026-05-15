@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../../lib/supabase';
-import { resizeImage } from '../../lib/imageUtils';
+import { compressImage } from '../../lib/imageUtils';
 import styles from './AdminForm.module.scss';
 
 const AdminForm = ({ onProductAdded, productToEdit, onCancel }) => {
@@ -66,12 +66,26 @@ const AdminForm = ({ onProductAdded, productToEdit, onCancel }) => {
 
       // 1. Upload new image if provided
       if (imageFile) {
-        // Resize image to max 500px before uploading
-        const compressedFile = await resizeImage(imageFile, 500, 0.8);
+        // Resize and compress image to max 1024px before uploading (WebP conversion)
+        const compressedFile = await compressImage(imageFile, 1024);
         
-        const fileExt = compressedFile.name.split('.').pop();
-        const fileName = `${Math.random()}.${fileExt}`;
+        const fileName = `${Date.now()}-${Math.random().toString(36).substring(2, 9)}.webp`;
         const filePath = `${fileName}`;
+
+        // If editing and we have a new image, delete the old one first to save space
+        if (isEditing && productToEdit.image) {
+          try {
+            const oldImagePath = productToEdit.image.split('/').pop();
+            if (oldImagePath && !oldImagePath.includes('placeholder')) {
+              await supabase.storage
+                .from('product-images')
+                .remove([oldImagePath]);
+            }
+          } catch (deleteError) {
+            console.warn('Could not delete old image:', deleteError.message);
+            // We continue anyway, as it's not a fatal error for the update
+          }
+        }
 
         const { error: uploadError } = await supabase.storage
           .from('product-images')

@@ -1,64 +1,44 @@
+import imageCompression from 'browser-image-compression';
+
 /**
- * Resizes an image file if it exceeds a maximum dimension.
+ * Compresses and resizes an image file.
  * @param {File} file - The original image file.
- * @param {number} maxDimension - The maximum width or height.
- * @param {number} quality - JPEG compression quality (0 to 1).
- * @returns {Promise<File>} - A promise that resolves to the resized image file.
+ * @param {number} maxWidthOrHeight - The maximum width or height.
+ * @returns {Promise<File>} - A promise that resolves to the compressed image file.
  */
-export const resizeImage = (file, maxDimension = 500, quality = 0.8) => {
-  return new Promise((resolve, reject) => {
-    // If it's not an image, just return the file
-    if (!file.type.startsWith('image/')) {
-      return resolve(file);
-    }
+export const compressImage = async (file, maxWidthOrHeight = 1024) => {
+  // If it's not an image, just return the file
+  if (!file.type.startsWith('image/')) {
+    return file;
+  }
 
-    const reader = new FileReader();
-    reader.readAsDataURL(file);
-    reader.onload = (event) => {
-      const img = new Image();
-      img.src = event.target.result;
-      img.onload = () => {
-        const canvas = document.createElement('canvas');
-        let width = img.width;
-        let height = img.height;
+  const options = {
+    maxSizeMB: 0.5, // Target size 500KB
+    maxWidthOrHeight: maxWidthOrHeight,
+    useWebWorker: true,
+    fileType: 'image/webp' // Convert to WebP for better compression
+  };
 
-        // Calculate new dimensions
-        if (width > height) {
-          if (width > maxDimension) {
-            height *= maxDimension / width;
-            width = maxDimension;
-          }
-        } else {
-          if (height > maxDimension) {
-            width *= maxDimension / height;
-            height = maxDimension;
-          }
-        }
-
-        canvas.width = width;
-        canvas.height = height;
-
-        const ctx = canvas.getContext('2d');
-        ctx.drawImage(img, 0, 0, width, height);
-
-        canvas.toBlob(
-          (blob) => {
-            if (blob) {
-              const newFile = new File([blob], file.name, {
-                type: 'image/jpeg',
-                lastModified: Date.now(),
-              });
-              resolve(newFile);
-            } else {
-              reject(new Error('Canvas to Blob failed'));
-            }
-          },
-          'image/jpeg',
-          quality
-        );
-      };
-      img.onerror = (err) => reject(new Error('Image load failed'));
-    };
-    reader.onerror = (err) => reject(new Error('File reading failed'));
-  });
+  try {
+    const compressedBlob = await imageCompression(file, options);
+    // Create a new file from the blob, changing the extension to .webp
+    const fileName = file.name.substring(0, file.name.lastIndexOf('.')) || file.name;
+    const compressedFile = new File([compressedBlob], `${fileName}.webp`, {
+      type: 'image/webp',
+      lastModified: Date.now(),
+    });
+    return compressedFile;
+  } catch (error) {
+    console.error('Compression failed:', error);
+    return file; // Fallback to original file on error
+  }
 };
+
+/**
+ * @deprecated Use compressImage instead.
+ * Maintaining for compatibility during migration.
+ */
+export const resizeImage = async (file, maxDimension = 500, quality = 0.8) => {
+  return compressImage(file, maxDimension);
+};
+

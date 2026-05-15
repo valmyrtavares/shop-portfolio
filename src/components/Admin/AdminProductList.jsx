@@ -13,6 +13,21 @@ const AdminProductList = ({ products, onRefresh, onBack }) => {
     
     try {
       setLoading(true);
+      // 1. Delete the image from storage if it exists
+      if (deletingProduct.image) {
+        try {
+          const imagePath = deletingProduct.image.split('/').pop();
+          if (imagePath && !imagePath.includes('placeholder')) {
+            await supabase.storage
+              .from('product-images')
+              .remove([imagePath]);
+          }
+        } catch (storageError) {
+          console.warn('Could not delete image from storage:', storageError.message);
+        }
+      }
+
+      // 2. Delete the product from the database
       const { error } = await supabase
         .from('products')
         .delete()

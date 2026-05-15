@@ -2,7 +2,8 @@
 
 .contact {
   padding: 10rem 0;
-  background-color: white;
+  background-color: var(--secondary-bg-color, white);
+  color: var(--secondary-text-color, #{$color-text});
 
   .container {
     max-width: $max-width;
@@ -19,7 +20,7 @@
     font-family: $font-sans;
     font-size: 0.7rem;
     letter-spacing: 0.3rem;
-    color: $color-text-muted;
+    color: var(--secondary-text-muted-color, #{$color-text-muted});
     margin-bottom: 1.5rem;
     display: block;
   }
@@ -33,7 +34,7 @@
   .divider {
     width: 60px;
     height: 1px;
-    background-color: $color-text;
+    background-color: var(--secondary-text-color, #{$color-text});
     margin: 0 auto 2rem;
   }
 
@@ -41,7 +42,7 @@
     font-family: $font-sans;
     font-size: 0.7rem;
     letter-spacing: 0.2rem;
-    color: $color-text-muted;
+    color: var(--secondary-text-muted-color, #{$color-text-muted});
   }
 }
 
@@ -62,7 +63,8 @@
       width: 100%;
       background: transparent;
       border: none;
-      border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+      border-bottom: 1px solid var(--secondary-border-color, rgba(0, 0, 0, 0.1));
+      color: var(--secondary-text-color, #{$color-text});
       padding: 1rem 0;
       font-family: $font-sans;
       font-size: 0.8rem;
@@ -71,14 +73,14 @@
       outline: none;
 
       &:focus {
-        border-bottom-color: $color-text;
+        border-bottom-color: var(--secondary-text-color, #{$color-text});
       }
     }
   }
 
   .submitButton {
-    background-color: $color-text;
-    color: white;
+    background-color: var(--secondary-text-color, #{$color-text});
+    color: var(--secondary-bg-color, white);
     padding: 1.5rem;
     border: none;
     font-family: $font-sans;
@@ -106,14 +108,14 @@
       font-family: $font-sans;
       font-size: 0.7rem;
       letter-spacing: 0.2rem;
-      color: $color-text-muted;
+      color: var(--secondary-text-muted-color, #{$color-text-muted});
       margin-bottom: 1rem;
     }
 
     p {
       font-size: 1rem;
       line-height: 1.6;
-      color: $color-text;
+      color: var(--secondary-text-color, #{$color-text});
     }
   }
 }
