@@ -14,16 +14,18 @@ const AdminSignup = () => {
     setMessage({ type: '', text: '' });
 
     try {
-      const { error } = await supabase.auth.signUp({
+      const { data, error } = await supabase.auth.signUp({
         email,
         password,
       });
 
       if (error) throw error;
       
+      const userId = data.user?.id || 'ID pendente de confirmação';
+
       setMessage({ 
         type: 'success', 
-        text: 'CONTA CRIADA! Verifique seu e-mail para confirmar o cadastro (ou peça ao administrador para ativar sua conta).' 
+        text: `CONTA CRIADA! Informe este ID ao administrador para ativar sua loja:\n\nID: ${userId}` 
       });
       setEmail('');
       setPassword('');

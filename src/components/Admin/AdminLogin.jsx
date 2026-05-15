@@ -30,6 +30,23 @@ const AdminLogin = () => {
     }
   };
 
+  const handleForgotPassword = async () => {
+    if (!email) {
+      alert('Por favor, digite seu e-mail primeiro para recuperar a senha.');
+      return;
+    }
+    
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: `${window.location.origin}${window.location.pathname}`,
+      });
+      if (error) throw error;
+      alert('E-mail de recuperação enviado! Verifique sua caixa de entrada.');
+    } catch (err) {
+      alert('Erro: ' + err.message);
+    }
+  };
+
   return (
     <div className={styles.loginContainer}>
       <div className={styles.loginCard}>
@@ -66,6 +83,24 @@ const AdminLogin = () => {
 
           <button type="submit" className={styles.loginButton} disabled={loading}>
             {loading ? 'AUTENTICANDO...' : 'ENTRAR NO PAINEL'}
+          </button>
+
+          <button 
+            type="button" 
+            onClick={handleForgotPassword}
+            style={{ 
+              background: 'none', 
+              border: 'none', 
+              fontSize: '0.6rem', 
+              marginTop: '1.5rem', 
+              cursor: 'pointer',
+              textDecoration: 'underline',
+              opacity: 0.6,
+              width: '100%',
+              textAlign: 'center'
+            }}
+          >
+            ESQUECI MINHA SENHA
           </button>
           
           {error && <div className={styles.errorMessage}>{error}</div>}
