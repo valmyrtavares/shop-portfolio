@@ -14,6 +14,7 @@ import AdminLogin from './components/Admin/AdminLogin';
 import AdminSiteSettings from './components/Admin/AdminSiteSettings';
 import FeaturedCarousel from './components/FeaturedCarousel/FeaturedCarousel';
 import { supabase } from './lib/supabase';
+import { Routes, Route, useParams, useNavigate, useLocation } from 'react-router-dom';
 
 function App() {
   const [products, setProducts] = useState([]);
@@ -25,11 +26,9 @@ function App() {
   const [loading, setLoading] = useState(true);
   const [isAdmin, setIsAdmin] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [adminView, setAdminView] = useState('menu'); // 'menu', 'add', 'list', 'categories', 'about'
   const [activeCategory, setActiveCategory] = useState(null);
   const [initialCheckDone, setInitialCheckDone] = useState(false);
   const [currentStore, setCurrentStore] = useState(null);
-  const [storeSlug, setStoreSlug] = useState('loja-principal'); // Default for now
 
   // Initial deep link check once products are loaded
   useEffect(() => {
@@ -169,14 +168,14 @@ function App() {
     };
   }, []);
 
-  const initializeStore = async () => {
+  const initializeStore = async (slug) => {
     try {
       setLoading(true);
       // 1. Fetch store info by slug
       const { data: store, error } = await supabase
         .from('stores')
         .select('*')
-        .eq('slug', storeSlug)
+        .eq('slug', slug)
         .single();
 
       if (error) throw error;
@@ -200,199 +199,199 @@ function App() {
     await supabase.auth.signOut();
     setIsAuthenticated(false);
     setIsAdmin(false);
-    window.history.pushState({}, '', window.location.pathname);
   };
 
-  const fetchProducts = async (storeId) => {
-    try {
-      if (!storeId) return;
-      const { data, error } = await supabase
-        .from('products')
-        .select('*')
-        .eq('store_id', storeId)
-        .order('id', { ascending: true });
+  // Wrapper component to handle the dynamic slug
+  const ShopContent = ({ isForAdmin = false }) => {
+    const { slug } = useParams();
+    const navigate = useNavigate();
+    const location = useLocation();
+    const [adminView, setAdminView] = useState('menu');
 
-      if (error) throw error;
-      setProducts(data || []);
-    } catch (error) {
-      console.error('Error fetching products:', error.message);
+    useEffect(() => {
+      if (slug) {
+        initializeStore(slug);
+      }
+    }, [slug]);
+
+    useEffect(() => {
+      if (isForAdmin) {
+        setIsAdmin(true);
+      } else {
+        setIsAdmin(false);
+      }
+    }, [isForAdmin]);
+
+    if (loading && !currentStore) {
+      return (
+        <div style={{ textAlign: 'center', padding: '10rem 0', letterSpacing: '0.2rem', fontSize: '0.8rem', opacity: 0.5 }}>
+          INITIALIZING SHOP...
+        </div>
+      );
     }
-  };
 
-  const fetchCategories = async (storeId) => {
-    try {
-      if (!storeId) return;
-      const { data, error } = await supabase
-        .from('categories')
-        .select('*')
-        .eq('store_id', storeId)
-        .order('name');
-      if (error) throw error;
-      setCategories(data || []);
-    } catch (error) {
-      console.error('Error fetching categories:', error.message);
+    if (!currentStore && !loading) {
+      return (
+        <div style={{ textAlign: 'center', padding: '10rem 0' }}>
+          <h2>LOJA NÃO ENCONTRADA</h2>
+          <p>Verifique se o endereço está correto.</p>
+        </div>
+      );
     }
-  };
 
-  const fetchAboutContent = async (storeId) => {
-    try {
-      if (!storeId) return;
-      const { data, error } = await supabase
-        .from('about_content')
-        .select('*')
-        .eq('store_id', storeId)
-        .single();
-      
-      if (error && error.code !== 'PGRST116') throw error;
-      if (data) setAboutContent(data);
-    } catch (error) {
-      console.error('Error fetching about content:', error.message);
-    }
-  };
+    return (
+      <>
+        <Header 
+          isAdmin={isAdmin && isAuthenticated} 
+          onToggleAdmin={(val) => navigate(val ? `/${slug}/admin` : `/${slug}`)} 
+          categories={categories}
+          settings={siteSettings}
+          onCategorySelect={(cat, shouldScroll = true) => {
+            setActiveCategory(cat);
+            setAdminView('menu');
+            if (shouldScroll) {
+              const el = document.getElementById('collection');
+              if (el) el.scrollIntoView({ behavior: 'smooth' });
+            }
+          }}
+          onCarouselOpen={() => setIsCarouselOpen(true)}
+        />
+        <main>
+          {isAdmin ? (
+            <section id="admin">
+              {!isAuthenticated ? (
+                <AdminLogin />
+              ) : (
+                <>
+                  <div style={{ display: 'flex', justifyContent: 'center', gap: '1rem', paddingTop: '4rem' }}>
+                    <button 
+                      onClick={() => navigate(`/${slug}`)}
+                      style={{ 
+                        background: 'none', 
+                        border: '1px solid #ddd', 
+                        padding: '0.5rem 1rem', 
+                        fontSize: '0.6rem', 
+                        letterSpacing: '0.1rem',
+                        cursor: 'pointer'
+                      }}
+                    >
+                      &larr; VOLTAR AO SITE
+                    </button>
 
-  const filteredProducts = activeCategory 
-    ? products.filter(p => p.category_id === activeCategory.id)
-    : products;
+                    <button 
+                      onClick={handleLogout}
+                      style={{ 
+                        background: 'none', 
+                        border: '1px solid #ff4d4d', 
+                        color: '#ff4d4d',
+                        padding: '0.5rem 1rem', 
+                        fontSize: '0.6rem', 
+                        letterSpacing: '0.1rem',
+                        cursor: 'pointer'
+                      }}
+                    >
+                      SAIR (LOGOUT)
+                    </button>
+                  </div>
+                  
+                  {adminView === 'menu' && (
+                    <AdminDashboard onViewChange={setAdminView} />
+                  )}
+
+                  {adminView === 'add' && (
+                    <AdminForm 
+                      onProductAdded={() => fetchProducts(currentStore.id)} 
+                      onCancel={() => setAdminView('menu')} 
+                      currentStoreId={currentStore?.id}
+                    />
+                  )}
+
+                  {adminView === 'list' && (
+                    <AdminProductList 
+                      products={products} 
+                      onRefresh={() => fetchProducts(currentStore.id)} 
+                      onBack={() => setAdminView('menu')}
+                    />
+                  )}
+
+                  {adminView === 'categories' && (
+                    <AdminCategoryManager 
+                      currentStoreId={currentStore?.id}
+                      onBack={() => {
+                        setAdminView('menu');
+                        fetchCategories(currentStore.id);
+                      }} 
+                    />
+                  )}
+
+                  {adminView === 'about' && (
+                    <AdminAboutManager 
+                      currentStoreId={currentStore?.id}
+                      onBack={() => {
+                        setAdminView('menu');
+                        initializeStore(slug);
+                      }}
+                    />
+                  )}
+
+                  {adminView === 'settings' && (
+                    <AdminSiteSettings 
+                      currentStoreId={currentStore?.id}
+                      onBack={() => {
+                        setAdminView('menu');
+                        fetchSiteSettings(currentStore.id);
+                      }}
+                    />
+                  )}
+                </>
+              )}
+            </section>
+          ) : (
+            <>
+              <Hero settings={siteSettings} />
+              <section id="collection">
+                {activeCategory && (
+                  <div style={{ textAlign: 'center', padding: '4rem 0 0', fontFamily: 'serif' }}>
+                    <h2 style={{ fontSize: '1.2rem', letterSpacing: '0.2rem', opacity: 0.6 }}>{activeCategory.name.toUpperCase()}</h2>
+                    <button 
+                      onClick={() => setActiveCategory(null)}
+                      style={{ background: 'none', border: 'none', fontSize: '0.6rem', letterSpacing: '0.1rem', cursor: 'pointer', marginTop: '1rem', textDecoration: 'underline' }}
+                    >
+                      VER TODA A COLEÇÃO
+                    </button>
+                  </div>
+                )}
+                {loading ? (
+                  <div style={{ textAlign: 'center', padding: '10rem 0', letterSpacing: '0.2rem', fontSize: '0.8rem', opacity: 0.5 }}>
+                    LOADING...
+                  </div>
+                ) : (
+                  <ProductGrid products={filteredProducts} onProductClick={setSelectedProduct} />
+                )}
+              </section>
+              <About content={aboutContent} />
+              <Contact contactInfo={aboutContent} />
+            </>
+          )}
+        </main>
+      </>
+    );
+  };
 
   return (
     <div className="app">
-      <Header 
-        isAdmin={isAdmin && isAuthenticated} 
-        onToggleAdmin={(val) => setIsAdmin(val)} 
-        categories={categories}
-        settings={siteSettings}
-        onCategorySelect={(cat, shouldScroll = true) => {
-          setActiveCategory(cat);
-          setAdminView('menu');
-          // Scroll to collection only if required
-          if (shouldScroll) {
-            const el = document.getElementById('collection');
-            if (el) el.scrollIntoView({ behavior: 'smooth' });
-          }
-        }}
-        onCarouselOpen={() => setIsCarouselOpen(true)}
-      />
-      <main>
-        {isAdmin ? (
-          <section id="admin">
-            {!isAuthenticated ? (
-              <AdminLogin />
-            ) : (
-              <>
-                <div style={{ display: 'flex', justifyContent: 'center', gap: '1rem', paddingTop: '4rem' }}>
-                  <button 
-                    onClick={() => {
-                      setIsAdmin(false);
-                      window.history.pushState({}, '', window.location.pathname);
-                    }}
-                    style={{ 
-                      background: 'none', 
-                      border: '1px solid #ddd', 
-                      padding: '0.5rem 1rem', 
-                      fontSize: '0.6rem', 
-                      letterSpacing: '0.1rem',
-                      cursor: 'pointer'
-                    }}
-                  >
-                    &larr; VOLTAR AO SITE
-                  </button>
-
-                  <button 
-                    onClick={handleLogout}
-                    style={{ 
-                      background: 'none', 
-                      border: '1px solid #ff4d4d', 
-                      color: '#ff4d4d',
-                      padding: '0.5rem 1rem', 
-                      fontSize: '0.6rem', 
-                      letterSpacing: '0.1rem',
-                      cursor: 'pointer'
-                    }}
-                  >
-                    SAIR (LOGOUT)
-                  </button>
-                </div>
-                
-                {adminView === 'menu' && (
-                  <AdminDashboard onViewChange={setAdminView} />
-                )}
-
-                {adminView === 'add' && (
-                  <AdminForm 
-                    onProductAdded={() => fetchProducts(currentStore.id)} 
-                    onCancel={() => setAdminView('menu')} 
-                    currentStoreId={currentStore?.id}
-                  />
-                )}
-
-                {adminView === 'list' && (
-                  <AdminProductList 
-                    products={products} 
-                    onRefresh={() => fetchProducts(currentStore.id)} 
-                    onBack={() => setAdminView('menu')}
-                  />
-                )}
-
-                {adminView === 'categories' && (
-                  <AdminCategoryManager 
-                    currentStoreId={currentStore?.id}
-                    onBack={() => {
-                      setAdminView('menu');
-                      fetchCategories(currentStore.id); // Refresh categories in case they changed
-                    }} 
-                  />
-                )}
-
-                {adminView === 'about' && (
-                  <AdminAboutManager 
-                    currentStoreId={currentStore?.id}
-                    onBack={() => {
-                      setAdminView('menu');
-                      initializeStore();
-                    }}
-                  />
-                )}
-
-                {adminView === 'settings' && (
-                  <AdminSiteSettings 
-                    currentStoreId={currentStore?.id}
-                    onBack={() => {
-                      setAdminView('menu');
-                      fetchSiteSettings(currentStore.id);
-                    }}
-                  />
-                )}
-              </>
-            )}
-          </section>
-        ) : (
-          <>
-            <Hero settings={siteSettings} />
-            <section id="collection">
-              {activeCategory && (
-                <div style={{ textAlign: 'center', padding: '4rem 0 0', fontFamily: 'serif' }}>
-                  <h2 style={{ fontSize: '1.2rem', letterSpacing: '0.2rem', opacity: 0.6 }}>{activeCategory.name.toUpperCase()}</h2>
-                  <button 
-                    onClick={() => setActiveCategory(null)}
-                    style={{ background: 'none', border: 'none', fontSize: '0.6rem', letterSpacing: '0.1rem', cursor: 'pointer', marginTop: '1rem', textDecoration: 'underline' }}
-                  >
-                    VER TODA A COLEÇÃO
-                  </button>
-                </div>
-              )}
-              {loading ? (
-                <div style={{ textAlign: 'center', padding: '10rem 0', letterSpacing: '0.2rem', fontSize: '0.8rem', opacity: 0.5 }}>
-                  LOADING...
-                </div>
-              ) : (
-                <ProductGrid products={filteredProducts} onProductClick={setSelectedProduct} />
-              )}
-            </section>
-            <About content={aboutContent} />
-            <Contact contactInfo={aboutContent} />
-          </>
-        )}
-      </main>
+      <Routes>
+        <Route path="/:slug" element={<ShopContent isForAdmin={false} />} />
+        <Route path="/:slug/admin" element={<ShopContent isForAdmin={true} />} />
+        {/* Landing page for the root domain could go here */}
+        <Route path="/" element={
+          <div style={{ textAlign: 'center', padding: '10rem 0' }}>
+            <h1>BEM-VINDO À VITRINE ARTESANAL</h1>
+            <p>Selecione uma loja para visitar.</p>
+            <a href="/loja-principal" style={{ textDecoration: 'underline' }}>Ir para Loja Principal</a>
+          </div>
+        } />
+      </Routes>
       <footer style={{ 
         textAlign: 'center', 
         padding: '6rem 0', 
