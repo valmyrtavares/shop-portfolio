@@ -1,30 +1,32 @@
 import React, { useState } from 'react';
+import { supabase } from '../../lib/supabase';
 import styles from './AdminLogin.module.scss';
 
-const AdminLogin = ({ onLogin }) => {
+const AdminLogin = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
+    setLoading(true);
 
-    // Validations (simple for MVP)
-    if (!email || !password) {
-      setError('POR FAVOR, PREENCHA TODOS OS CAMPOS.');
-      return;
-    }
+    try {
+      const { error: authError } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
 
-    if (!email.includes('@')) {
-      setError('POR FAVOR, INSIRA UM E-MAIL VÁLIDO.');
-      return;
-    }
-
-    if (password === '123456') {
-      onLogin();
-    } else {
-      setError('SENHA INCORRETA.');
+      if (authError) throw authError;
+      
+      // onLogin is no longer needed as App.jsx will listen to auth state changes
+    } catch (err) {
+      console.error('Login error:', err.message);
+      setError('E-MAIL OU SENHA INCORRETOS.');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -46,6 +48,7 @@ const AdminLogin = ({ onLogin }) => {
               onChange={(e) => setEmail(e.target.value)} 
               placeholder="seu@email.com"
               required 
+              disabled={loading}
             />
           </div>
           
@@ -57,18 +60,24 @@ const AdminLogin = ({ onLogin }) => {
               onChange={(e) => setPassword(e.target.value)} 
               placeholder="******"
               required 
+              disabled={loading}
             />
           </div>
 
-          <button type="submit" className={styles.loginButton}>
-            ENTRAR NO PAINEL
+          <button type="submit" className={styles.loginButton} disabled={loading}>
+            {loading ? 'AUTENTICANDO...' : 'ENTRAR NO PAINEL'}
           </button>
           
           {error && <div className={styles.errorMessage}>{error}</div>}
         </form>
+        
+        <div style={{ marginTop: '2rem', fontSize: '0.65rem', opacity: 0.5, textAlign: 'center', lineHeight: '1.4' }}>
+          CASO NÃO TENHA ACESSO, ENTRE EM CONTATO COM O ADMINISTRADOR DO SISTEMA.
+        </div>
       </div>
     </div>
   );
 };
 
 export default AdminLogin;
+

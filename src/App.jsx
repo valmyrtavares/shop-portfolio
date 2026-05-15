@@ -24,9 +24,7 @@ function App() {
   const [isCarouselOpen, setIsCarouselOpen] = useState(false);
   const [loading, setLoading] = useState(true);
   const [isAdmin, setIsAdmin] = useState(false);
-  const [isAuthenticated, setIsAuthenticated] = useState(
-    sessionStorage.getItem('admin_authenticated') === 'true'
-  );
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [adminView, setAdminView] = useState('menu'); // 'menu', 'add', 'list', 'categories', 'about'
   const [activeCategory, setActiveCategory] = useState(null);
   const [initialCheckDone, setInitialCheckDone] = useState(false);
@@ -155,7 +153,20 @@ function App() {
       setIsAdmin(true);
     }
 
+    // Initialize Auth Listener
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === 'SIGNED_IN') {
+        setIsAuthenticated(true);
+      } else if (event === 'SIGNED_OUT') {
+        setIsAuthenticated(false);
+      }
+    });
+
     initializeStore();
+
+    return () => {
+      subscription.unsubscribe();
+    };
   }, []);
 
   const initializeStore = async () => {
@@ -185,14 +196,9 @@ function App() {
     }
   };
 
-  const handleLogin = () => {
-    setIsAuthenticated(true);
-    sessionStorage.setItem('admin_authenticated', 'true');
-  };
-
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
     setIsAuthenticated(false);
-    sessionStorage.removeItem('admin_authenticated');
     setIsAdmin(false);
     window.history.pushState({}, '', window.location.pathname);
   };
@@ -270,7 +276,7 @@ function App() {
         {isAdmin ? (
           <section id="admin">
             {!isAuthenticated ? (
-              <AdminLogin onLogin={handleLogin} />
+              <AdminLogin />
             ) : (
               <>
                 <div style={{ display: 'flex', justifyContent: 'center', gap: '1rem', paddingTop: '4rem' }}>
