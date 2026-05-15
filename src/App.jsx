@@ -30,6 +30,8 @@ function App() {
   const [adminView, setAdminView] = useState('menu'); // 'menu', 'add', 'list', 'categories', 'about'
   const [activeCategory, setActiveCategory] = useState(null);
   const [initialCheckDone, setInitialCheckDone] = useState(false);
+  const [currentStore, setCurrentStore] = useState(null);
+  const [storeSlug, setStoreSlug] = useState('loja-principal'); // Default for now
 
   // Initial deep link check once products are loaded
   useEffect(() => {
@@ -89,11 +91,13 @@ function App() {
     return () => window.removeEventListener('popstate', handlePopState);
   }, [products]);
 
-  const fetchSiteSettings = async () => {
+  const fetchSiteSettings = async (storeId) => {
     try {
+      if (!storeId) return;
       const { data, error } = await supabase
         .from('site_settings')
         .select('*')
+        .eq('store_id', storeId)
         .single();
       
       if (error && error.code !== 'PGRST116') throw error;
@@ -151,8 +155,35 @@ function App() {
       setIsAdmin(true);
     }
 
-    fetchInitialData();
+    initializeStore();
   }, []);
+
+  const initializeStore = async () => {
+    try {
+      setLoading(true);
+      // 1. Fetch store info by slug
+      const { data: store, error } = await supabase
+        .from('stores')
+        .select('*')
+        .eq('slug', storeSlug)
+        .single();
+
+      if (error) throw error;
+      setCurrentStore(store);
+
+      // 2. Fetch all data for this store
+      await Promise.all([
+        fetchProducts(store.id), 
+        fetchCategories(store.id), 
+        fetchAboutContent(store.id),
+        fetchSiteSettings(store.id)
+      ]);
+    } catch (err) {
+      console.error('Failed to initialize store:', err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleLogin = () => {
     setIsAuthenticated(true);
@@ -166,25 +197,13 @@ function App() {
     window.history.pushState({}, '', window.location.pathname);
   };
 
-  const fetchInitialData = async () => {
+  const fetchProducts = async (storeId) => {
     try {
-      setLoading(true);
-      await Promise.all([
-        fetchProducts(), 
-        fetchCategories(), 
-        fetchAboutContent(),
-        fetchSiteSettings()
-      ]);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const fetchProducts = async () => {
-    try {
+      if (!storeId) return;
       const { data, error } = await supabase
         .from('products')
         .select('*')
+        .eq('store_id', storeId)
         .order('id', { ascending: true });
 
       if (error) throw error;
@@ -194,11 +213,13 @@ function App() {
     }
   };
 
-  const fetchCategories = async () => {
+  const fetchCategories = async (storeId) => {
     try {
+      if (!storeId) return;
       const { data, error } = await supabase
         .from('categories')
         .select('*')
+        .eq('store_id', storeId)
         .order('name');
       if (error) throw error;
       setCategories(data || []);
@@ -207,11 +228,13 @@ function App() {
     }
   };
 
-  const fetchAboutContent = async () => {
+  const fetchAboutContent = async (storeId) => {
     try {
+      if (!storeId) return;
       const { data, error } = await supabase
         .from('about_content')
         .select('*')
+        .eq('store_id', storeId)
         .single();
       
       if (error && error.code !== 'PGRST116') throw error;
@@ -290,42 +313,46 @@ function App() {
 
                 {adminView === 'add' && (
                   <AdminForm 
-                    onProductAdded={fetchProducts} 
+                    onProductAdded={() => fetchProducts(currentStore.id)} 
                     onCancel={() => setAdminView('menu')} 
+                    currentStoreId={currentStore?.id}
                   />
                 )}
 
                 {adminView === 'list' && (
                   <AdminProductList 
                     products={products} 
-                    onRefresh={fetchProducts} 
+                    onRefresh={() => fetchProducts(currentStore.id)} 
                     onBack={() => setAdminView('menu')}
                   />
                 )}
 
                 {adminView === 'categories' && (
                   <AdminCategoryManager 
+                    currentStoreId={currentStore?.id}
                     onBack={() => {
                       setAdminView('menu');
-                      fetchCategories(); // Refresh categories in case they changed
+                      fetchCategories(currentStore.id); // Refresh categories in case they changed
                     }} 
                   />
                 )}
 
                 {adminView === 'about' && (
                   <AdminAboutManager 
+                    currentStoreId={currentStore?.id}
                     onBack={() => {
                       setAdminView('menu');
-                      fetchInitialData();
+                      initializeStore();
                     }}
                   />
                 )}
 
                 {adminView === 'settings' && (
                   <AdminSiteSettings 
+                    currentStoreId={currentStore?.id}
                     onBack={() => {
                       setAdminView('menu');
-                      fetchSiteSettings();
+                      fetchSiteSettings(currentStore.id);
                     }}
                   />
                 )}

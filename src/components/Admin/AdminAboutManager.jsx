@@ -3,7 +3,7 @@ import { supabase } from '../../lib/supabase';
 import { resizeImage } from '../../lib/imageUtils';
 import styles from './AdminAboutManager.module.scss';
 
-const AdminAboutManager = ({ onBack }) => {
+const AdminAboutManager = ({ onBack, currentStoreId }) => {
   const [formData, setFormData] = useState({
     title: '',
     description: '',
@@ -28,6 +28,7 @@ const AdminAboutManager = ({ onBack }) => {
       const { data, error } = await supabase
         .from('about_content')
         .select('*')
+        .eq('store_id', currentStoreId)
         .single();
       
       if (error && error.code !== 'PGRST116') throw error;
@@ -90,15 +91,15 @@ const AdminAboutManager = ({ onBack }) => {
         currentImageUrl = publicUrl;
       }
 
-      // 2. Update about_content (ID is always 1)
+      // 2. Update about_content (Filtered by store_id)
       const { error: upsertError } = await supabase
         .from('about_content')
         .upsert({
-          id: 1,
           ...formData,
+          store_id: currentStoreId,
           image_url: currentImageUrl,
           updated_at: new Date().toISOString()
-        });
+        }, { onConflict: 'store_id' }); // Assuming we add a unique constraint or just upsert by store_id
 
       if (upsertError) throw upsertError;
 

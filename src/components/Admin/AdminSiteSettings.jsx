@@ -3,7 +3,7 @@ import { supabase } from '../../lib/supabase';
 import { resizeImage } from '../../lib/imageUtils';
 import styles from './AdminAboutManager.module.scss'; // Reusing styles from AboutManager for consistency
 
-const AdminSiteSettings = ({ onBack }) => {
+const AdminSiteSettings = ({ onBack, currentStoreId }) => {
   const [formData, setFormData] = useState({
     header_title: '',
     header_subtitle: '',
@@ -26,6 +26,7 @@ const AdminSiteSettings = ({ onBack }) => {
       const { data, error } = await supabase
         .from('site_settings')
         .select('*')
+        .eq('store_id', currentStoreId)
         .single();
       
       if (error && error.code !== 'PGRST116') throw error;
@@ -86,15 +87,15 @@ const AdminSiteSettings = ({ onBack }) => {
         currentLogoUrl = publicUrl;
       }
 
-      // 2. Update site_settings (ID is always 1)
+      // 2. Update site_settings (Filtered by store_id)
       const { error: upsertError } = await supabase
         .from('site_settings')
         .upsert({
-          id: 1,
           ...formData,
+          store_id: currentStoreId,
           logo_url: currentLogoUrl,
           updated_at: new Date().toISOString()
-        });
+        }, { onConflict: 'store_id' });
 
       if (upsertError) throw upsertError;
 

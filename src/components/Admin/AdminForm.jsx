@@ -3,7 +3,7 @@ import { supabase } from '../../lib/supabase';
 import { compressImage } from '../../lib/imageUtils';
 import styles from './AdminForm.module.scss';
 
-const AdminForm = ({ onProductAdded, productToEdit, onCancel }) => {
+const AdminForm = ({ onProductAdded, productToEdit, onCancel, currentStoreId }) => {
   const [formData, setFormData] = useState({
     name: productToEdit?.name || '',
     price: productToEdit?.price || '',
@@ -110,7 +110,8 @@ const AdminForm = ({ onProductAdded, productToEdit, onCancel }) => {
         ...formData,
         price: cleanPrice,
         image: imageUrl,
-        category_id: formData.category_id || null
+        category_id: formData.category_id || null,
+        store_id: currentStoreId
       };
 
       if (isEditing) {

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { supabase } from '../../lib/supabase';
 import styles from './AdminCategoryManager.module.scss';
 
-const AdminCategoryManager = ({ onBack }) => {
+const AdminCategoryManager = ({ onBack, currentStoreId }) => {
   const [categories, setCategories] = useState([]);
   const [categoryName, setCategoryName] = useState('');
   const [editingId, setEditingId] = useState(null);
@@ -18,6 +18,7 @@ const AdminCategoryManager = ({ onBack }) => {
       const { data, error } = await supabase
         .from('categories')
         .select('*')
+        .eq('store_id', currentStoreId)
         .order('name');
       if (error) throw error;
       setCategories(data || []);
@@ -46,7 +47,7 @@ const AdminCategoryManager = ({ onBack }) => {
         // Create
         const { error } = await supabase
           .from('categories')
-          .insert([{ name: categoryName.trim() }]);
+          .insert([{ name: categoryName.trim(), store_id: currentStoreId }]);
         if (error) throw error;
         setMessage({ type: 'success', text: 'CATEGORIA CRIADA!' });
       }
