@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { supabase } from '../../lib/supabase';
 import styles from './AdminLogin.module.scss';
 
-const AdminLogin = () => {
+const AdminLogin = ({ onDevBypass }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
@@ -106,7 +106,33 @@ const AdminLogin = () => {
           {error && <div className={styles.errorMessage}>{error}</div>}
         </form>
         
-        <div style={{ marginTop: '2rem', fontSize: '0.65rem', opacity: 0.5, textAlign: 'center', lineHeight: '1.4' }}>
+        {onDevBypass && (
+          <div style={{ marginTop: '2rem', paddingTop: '1.5rem', borderTop: '1px dashed #ccc', textAlign: 'center' }}>
+            <button
+              type="button"
+              onClick={onDevBypass}
+              style={{
+                background: '#222',
+                color: '#fff',
+                border: 'none',
+                padding: '0.75rem 1.2rem',
+                fontSize: '0.7rem',
+                fontWeight: 'bold',
+                letterSpacing: '0.05rem',
+                cursor: 'pointer',
+                borderRadius: '4px',
+                width: '100%'
+              }}
+            >
+              ⚡ ENTRAR EM MODO DESENVOLVEDOR (SEM SENHA)
+            </button>
+            <span style={{ display: 'block', marginTop: '0.5rem', fontSize: '0.6rem', opacity: 0.6 }}>
+              Acesso emergencial local ativado para testes
+            </span>
+          </div>
+        )}
+
+        <div style={{ marginTop: '1.5rem', fontSize: '0.65rem', opacity: 0.5, textAlign: 'center', lineHeight: '1.4' }}>
           CASO NÃO TENHA ACESSO, ENTRE EM CONTATO COM O ADMINISTRADOR DO SISTEMA.
         </div>
       </div>

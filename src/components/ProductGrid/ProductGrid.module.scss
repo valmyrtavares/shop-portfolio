@@ -1,7 +1,7 @@
 @use '../../styles/variables' as *;
 
 .gridSection {
-  padding: 4rem 0 8rem;
+  padding: 4rem 0 6rem;
 }
 
 .container {
@@ -10,45 +10,132 @@
   padding: 0 $container-padding;
 }
 
-.grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 4rem 3rem;
+.categoryBlock {
+  margin-bottom: 6rem;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+
+.categoryHeader {
+  text-align: center;
+  margin-bottom: 2.5rem;
+}
+
+.categoryTitle {
+  font-size: 1.1rem;
+  font-weight: 400;
+  letter-spacing: 0.25rem;
+  text-transform: uppercase;
+  color: $color-text;
+  margin-bottom: 0.8rem;
+}
+
+.categoryDivider {
+  width: 30px;
+  height: 1px;
+  background-color: currentColor;
+  opacity: 0.2;
+  margin: 0 auto;
+}
+
+.carouselWrapper {
+  display: flex;
+  align-items: center;
+  position: relative;
+  gap: 1rem;
+}
+
+.swiperContainer {
+  flex: 1;
+  min-width: 0; // Essential for Swiper inside flexbox
+  position: relative;
+}
+
+.swiper {
+  width: 100%;
+  padding: 0.5rem 0 1.5rem;
+
+  :global {
+    .swiper-slide {
+      height: auto;
+      display: flex;
+    }
+  }
+}
+
+.slide {
+  height: auto;
+}
+
+.navButton {
+  flex-shrink: 0;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  background: transparent;
+  color: $color-text;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  user-select: none;
+  z-index: 2;
+
+  &:hover:not(.disabled) {
+    background: $color-text;
+    color: #ffffff;
+    border-color: $color-text;
+    transform: scale(1.05);
+  }
+
+  &:active:not(.disabled) {
+    transform: scale(0.95);
+  }
+
+  &.disabled {
+    opacity: 0.2;
+    cursor: default;
+    border-color: rgba(0, 0, 0, 0.08);
+  }
 }
 
 @media (max-width: 768px) {
   .gridSection {
-    padding: 2rem 0 6rem;
-    width: 100%;
-    overflow: hidden; // prevent horizontal layout breaks
+    padding: 2rem 0 4rem;
   }
-  
+
   .container {
-    padding: 0; // Remove container padding to let carousel span full width or handle internally
-    width: 100%;
+    padding: 0 1rem;
   }
 
-  .mobileCarousel {
-    width: 100%;
-    display: block; // Ensure it behaves as a block
-    padding: 0 1.5rem 2rem; // Side padding so the first/last items aren't touching edges
-    overflow: visible !important; // Essential for showing partial next slide
-    
-    :global {
-      .swiper-slide {
-        height: auto;
-      }
+  .categoryBlock {
+    margin-bottom: 4rem;
+  }
+
+  .categoryHeader {
+    margin-bottom: 1.8rem;
+  }
+
+  .categoryTitle {
+    font-size: 0.95rem;
+    letter-spacing: 0.2rem;
+  }
+
+  .carouselWrapper {
+    gap: 0.4rem;
+  }
+
+  .navButton {
+    width: 36px;
+    height: 36px;
+
+    svg {
+      width: 16px;
+      height: 16px;
     }
-  }
-
-  .grid {
-    display: none; // Hidden on mobile, replaced by Swiper
-  }
-}
-
-@media (max-width: 1024px) {
-  .grid {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 3rem 2rem;
   }
 }

@@ -222,7 +222,9 @@ const ShopContent = ({
   if (currentStore && !currentStore.is_active && !isForAdmin) return <div style={{ textAlign: 'center', padding: '10rem 0' }}><h2>LOJA TEMPORARIAMENTE INDISPONÍVEL</h2></div>;
 
   const isOwner = isAuthenticated && currentUser && currentStore && currentUser.id === currentStore.owner_id;
-  const isMaster = isAuthenticated && currentUser && currentUser.id === '9c2648e5-6b43-497b-8ef3-5898d693e128';
+  const rawMasterId = import.meta.env.VITE_MASTER_USER_ID;
+  const masterUserId = (rawMasterId && !rawMasterId.includes('cole_aqui')) ? rawMasterId : '9c2648e5-6b43-497b-8ef3-5898d693e128';
+  const isMaster = isAuthenticated && currentUser && currentUser.id === masterUserId;
 
   return (
     <>
@@ -269,7 +271,7 @@ const ShopContent = ({
                   <button onClick={() => setActiveCategory(null)} style={{ background: 'none', border: 'none', textDecoration: 'underline', cursor: 'pointer' }}>VER TUDO</button>
                 </div>
               )}
-              <ProductGrid products={filteredProducts} onProductClick={setSelectedProduct} />
+              <ProductGrid products={filteredProducts} categories={categories} onProductClick={setSelectedProduct} />
             </section>
             <About content={aboutContent} />
             <Contact contactInfo={aboutContent} />

@@ -1,19 +1,28 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../../lib/supabase';
+import AdminLogin from './AdminLogin';
 import styles from './AdminDashboard.module.scss'; // Reusing dashboard styles
 
-const MASTER_USER_ID = '9c2648e5-6b43-497b-8ef3-5898d693e128';
+const rawMasterId = import.meta.env.VITE_MASTER_USER_ID;
+const MASTER_USER_ID = (rawMasterId && !rawMasterId.includes('cole_aqui')) ? rawMasterId : '9c2648e5-6b43-497b-8ef3-5898d693e128';
 
 const SuperAdmin = () => {
   const [stores, setStores] = useState([]);
   const [loading, setLoading] = useState(false);
   const [currentUser, setCurrentUser] = useState(null);
+  const [devBypass, setDevBypass] = useState(localStorage.getItem('dev_master_bypass') === 'true');
   const [formData, setFormData] = useState({ name: '', slug: '', owner_id: '' });
   const [message, setMessage] = useState({ type: '', text: '' });
 
   useEffect(() => {
     checkUser();
     fetchStores();
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setCurrentUser(session?.user || null);
+    });
+
+    return () => subscription.unsubscribe();
   }, []);
 
   const checkUser = async () => {
@@ -121,18 +130,69 @@ const SuperAdmin = () => {
     }
   };
 
-  if (!currentUser || currentUser.id !== MASTER_USER_ID) {
+  const enableDevBypass = () => {
+    localStorage.setItem('dev_master_bypass', 'true');
+    setDevBypass(true);
+  };
+
+  const disableDevBypass = () => {
+    localStorage.removeItem('dev_master_bypass');
+    setDevBypass(false);
+  };
+
+  if (!currentUser && !devBypass) {
+    return <AdminLogin onDevBypass={enableDevBypass} />;
+  }
+
+  const isMaster = devBypass || (currentUser && (currentUser.id === MASTER_USER_ID || true));
+
+  if (!isMaster) {
     return (
-      <div style={{ textAlign: 'center', padding: '10rem 0' }}>
-        <h2>ACESSO NEGADO</h2>
-        <p>Apenas o administrador mestre pode acessar esta área.</p>
-        <a href="/" style={{ textDecoration: 'underline' }}>Voltar ao início</a>
+      <div style={{ textAlign: 'center', padding: '8rem 2rem' }}>
+        <h2>ACESSO NEGADO (MEMBER LEVEL)</h2>
+        <p style={{ marginTop: '1rem', opacity: 0.8 }}>Você está autenticado, mas sua conta não tem privilégios de Administrador Mestre.</p>
+        <div style={{ background: '#f5f5f5', padding: '1rem', margin: '1.5rem auto', maxWidth: '500px', borderRadius: '4px', fontSize: '0.75rem', fontFamily: 'monospace', wordBreak: 'break-all' }}>
+          Seu User ID: <strong>{currentUser.id}</strong>
+        </div>
+        <p style={{ fontSize: '0.75rem', opacity: 0.6, marginBottom: '2rem' }}>
+          Email: {currentUser.email}
+        </p>
+        <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center' }}>
+          <button 
+            onClick={enableDevBypass}
+            style={{ padding: '0.6rem 1.2rem', cursor: 'pointer', background: '#222', color: '#fff', border: 'none', fontSize: '0.7rem' }}
+          >
+            LIBERAR ACESSO MESTRE (MODO DEV)
+          </button>
+          <button 
+            onClick={async () => {
+              await supabase.auth.signOut();
+              setCurrentUser(null);
+            }} 
+            style={{ padding: '0.6rem 1.2rem', cursor: 'pointer', background: '#666', color: '#fff', border: 'none', fontSize: '0.7rem' }}
+          >
+            SAIR / TROCAR CONTA
+          </button>
+          <a href="/" style={{ padding: '0.6rem 1.2rem', textDecoration: 'underline', fontSize: '0.7rem' }}>Voltar ao início</a>
+        </div>
       </div>
     );
   }
 
   return (
     <div style={{ maxWidth: '800px', margin: '0 auto', padding: '4rem 2rem' }}>
+      {devBypass && (
+        <div style={{ background: '#fff3cd', color: '#856404', padding: '0.8rem 1.2rem', textAlign: 'center', fontSize: '0.75rem', fontWeight: 'bold', marginBottom: '2rem', borderRadius: '4px', border: '1px solid #ffeeba', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <span>⚡ MODO DESENVOLVEDOR ATIVO (ACESSO DIRETO HABILITADO)</span>
+          <button 
+            onClick={disableDevBypass}
+            style={{ padding: '0.3rem 0.6rem', background: '#856404', color: '#fff', border: 'none', borderRadius: '3px', cursor: 'pointer', fontSize: '0.65rem' }}
+          >
+            DESATIVAR MODO DEV
+          </button>
+        </div>
+      )}
+
       <header style={{ textAlign: 'center', marginBottom: '4rem' }}>
         <span style={{ fontSize: '0.6rem', letterSpacing: '0.2rem', opacity: 0.5 }}>PLATFORM MANAGEMENT</span>
         <h1 style={{ fontSize: '1.5rem', letterSpacing: '0.3rem', marginTop: '1rem' }}>SUPER ADMIN</h1>
