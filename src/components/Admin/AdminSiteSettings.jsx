@@ -13,24 +13,27 @@ const AdminSiteSettings = ({ onBack, currentStoreId }) => {
     bg_color: '#ffffff',
     secondary_bg_color: '#ffffff'
   });
+  const [existingId, setExistingId] = useState(null);
   const [imageFile, setImageFile] = useState(null);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState({ type: '', text: '' });
 
   useEffect(() => {
     fetchSiteSettings();
-  }, []);
+  }, [currentStoreId]);
 
   const fetchSiteSettings = async () => {
     try {
+      if (!currentStoreId) return;
       const { data, error } = await supabase
         .from('site_settings')
         .select('*')
         .eq('store_id', currentStoreId)
-        .single();
+        .maybeSingle();
       
-      if (error && error.code !== 'PGRST116') throw error;
+      if (error) throw error;
       if (data) {
+        setExistingId(data.id);
         setFormData({
           header_title: data.header_title || '',
           header_subtitle: data.header_subtitle || '',
@@ -67,11 +70,10 @@ const AdminSiteSettings = ({ onBack, currentStoreId }) => {
 
       // 1. Upload new logo if provided
       if (imageFile) {
-        // Resize image to max 500px before uploading
-        const compressedFile = await resizeImage(imageFile, 500, 0.8);
+        // Resize and compress image
+        const compressedFile = await compressImage(imageFile, 600);
 
-        const fileExt = compressedFile.name.split('.').pop();
-        const fileName = `logo_${Math.random()}.${fileExt}`;
+        const fileName = `logo_${Date.now()}_${Math.random().toString(36).substring(2, 7)}.webp`;
         const filePath = `${fileName}`;
 
         const { error: uploadError } = await supabase.storage
@@ -87,17 +89,51 @@ const AdminSiteSettings = ({ onBack, currentStoreId }) => {
         currentLogoUrl = publicUrl;
       }
 
-      // 2. Update site_settings (Filtered by store_id)
-      const { error: upsertError } = await supabase
-        .from('site_settings')
-        .upsert({
-          ...formData,
-          store_id: currentStoreId,
-          logo_url: currentLogoUrl,
-          updated_at: new Date().toISOString()
-        }, { onConflict: 'store_id' });
+      // 2. Update existing site_settings or insert if not existing
+      let saveError = null;
 
-      if (upsertError) throw upsertError;
+      if (existingId) {
+        const { error } = await supabase
+          .from('site_settings')
+          .update({
+            ...formData,
+            logo_url: currentLogoUrl,
+            updated_at: new Date().toISOString()
+          })
+          .eq('id', existingId);
+        saveError = error;
+      } else {
+        const { data: updatedData, error: updateErr } = await supabase
+          .from('site_settings')
+          .update({
+            ...formData,
+            logo_url: currentLogoUrl,
+            updated_at: new Date().toISOString()
+          })
+          .eq('store_id', currentStoreId)
+          .select();
+
+        if (updateErr) {
+          saveError = updateErr;
+        } else if (updatedData && updatedData.length > 0) {
+          setExistingId(updatedData[0].id);
+        } else {
+          const { data: insertedData, error: insertErr } = await supabase
+            .from('site_settings')
+            .insert([{
+              ...formData,
+              store_id: currentStoreId,
+              logo_url: currentLogoUrl,
+              updated_at: new Date().toISOString()
+            }])
+            .select()
+            .single();
+          if (insertErr) saveError = insertErr;
+          if (insertedData) setExistingId(insertedData.id);
+        }
+      }
+
+      if (saveError) throw saveError;
 
       setMessage({ type: 'success', text: 'CONFIGURAÇÕES SALVAS COM SUCESSO!' });
       setFormData(prev => ({ ...prev, logo_url: currentLogoUrl }));

@@ -15,24 +15,27 @@ const AdminAboutManager = ({ onBack, currentStoreId }) => {
     instagram: '',
     pinterest: ''
   });
+  const [existingId, setExistingId] = useState(null);
   const [imageFile, setImageFile] = useState(null);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState({ type: '', text: '' });
 
   useEffect(() => {
     fetchAboutContent();
-  }, []);
+  }, [currentStoreId]);
 
   const fetchAboutContent = async () => {
     try {
+      if (!currentStoreId) return;
       const { data, error } = await supabase
         .from('about_content')
         .select('*')
         .eq('store_id', currentStoreId)
-        .single();
+        .maybeSingle();
       
-      if (error && error.code !== 'PGRST116') throw error;
+      if (error) throw error;
       if (data) {
+        setExistingId(data.id);
         setFormData({
           title: data.title || '',
           description: data.description || '',
@@ -71,11 +74,10 @@ const AdminAboutManager = ({ onBack, currentStoreId }) => {
 
       // 1. Upload new image if provided
       if (imageFile) {
-        // Resize image to max 500px before uploading
-        const compressedFile = await resizeImage(imageFile, 500, 0.8);
+        // Resize and compress image
+        const compressedFile = await compressImage(imageFile, 800);
         
-        const fileExt = compressedFile.name.split('.').pop();
-        const fileName = `about_${Math.random()}.${fileExt}`;
+        const fileName = `about_${Date.now()}_${Math.random().toString(36).substring(2, 7)}.webp`;
         const filePath = `${fileName}`;
 
         const { error: uploadError } = await supabase.storage
@@ -91,17 +93,51 @@ const AdminAboutManager = ({ onBack, currentStoreId }) => {
         currentImageUrl = publicUrl;
       }
 
-      // 2. Update about_content (Filtered by store_id)
-      const { error: upsertError } = await supabase
-        .from('about_content')
-        .upsert({
-          ...formData,
-          store_id: currentStoreId,
-          image_url: currentImageUrl,
-          updated_at: new Date().toISOString()
-        }, { onConflict: 'store_id' }); // Assuming we add a unique constraint or just upsert by store_id
+      // 2. Update existing about_content or insert if not existing
+      let saveError = null;
 
-      if (upsertError) throw upsertError;
+      if (existingId) {
+        const { error } = await supabase
+          .from('about_content')
+          .update({
+            ...formData,
+            image_url: currentImageUrl,
+            updated_at: new Date().toISOString()
+          })
+          .eq('id', existingId);
+        saveError = error;
+      } else {
+        const { data: updatedData, error: updateErr } = await supabase
+          .from('about_content')
+          .update({
+            ...formData,
+            image_url: currentImageUrl,
+            updated_at: new Date().toISOString()
+          })
+          .eq('store_id', currentStoreId)
+          .select();
+
+        if (updateErr) {
+          saveError = updateErr;
+        } else if (updatedData && updatedData.length > 0) {
+          setExistingId(updatedData[0].id);
+        } else {
+          const { data: insertedData, error: insertErr } = await supabase
+            .from('about_content')
+            .insert([{
+              ...formData,
+              store_id: currentStoreId,
+              image_url: currentImageUrl,
+              updated_at: new Date().toISOString()
+            }])
+            .select()
+            .single();
+          if (insertErr) saveError = insertErr;
+          if (insertedData) setExistingId(insertedData.id);
+        }
+      }
+
+      if (saveError) throw saveError;
 
       setMessage({ type: 'success', text: 'CONTEÚDO ATUALIZADO COM SUCESSO!' });
       setFormData(prev => ({ ...prev, image_url: currentImageUrl }));
