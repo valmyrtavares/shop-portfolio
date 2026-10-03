@@ -79,6 +79,36 @@
   }
 }
 
+.passwordWrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+
+  input {
+    padding-right: 2.5rem;
+  }
+}
+
+.eyeButton {
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 0.4rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: rgba(0, 0, 0, 0.45);
+  transition: color 0.2s ease;
+
+  &:hover {
+    color: #000;
+  }
+}
+
 .loginButton {
   margin-top: 1rem;
   padding: 1rem;
