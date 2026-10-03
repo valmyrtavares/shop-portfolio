@@ -29,19 +29,21 @@ const AdminSiteSettings = ({ onBack, currentStoreId }) => {
         .from('site_settings')
         .select('*')
         .eq('store_id', currentStoreId)
-        .maybeSingle();
+        .order('id', { ascending: false })
+        .limit(1);
       
       if (error) throw error;
-      if (data) {
-        setExistingId(data.id);
+      if (data && data.length > 0) {
+        const item = data[0];
+        setExistingId(item.id);
         setFormData({
-          header_title: data.header_title || '',
-          header_subtitle: data.header_subtitle || '',
-          hero_title: data.hero_title || '',
-          hero_subtitle: data.hero_subtitle || '',
-          logo_url: data.logo_url || '',
-          bg_color: data.bg_color || '#ffffff',
-          secondary_bg_color: data.secondary_bg_color || '#ffffff'
+          header_title: item.header_title || '',
+          header_subtitle: item.header_subtitle || '',
+          hero_title: item.hero_title || '',
+          hero_subtitle: item.hero_subtitle || '',
+          logo_url: item.logo_url || '',
+          bg_color: item.bg_color || '#ffffff',
+          secondary_bg_color: item.secondary_bg_color || '#ffffff'
         });
       }
     } catch (error) {

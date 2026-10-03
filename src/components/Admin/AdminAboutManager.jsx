@@ -31,21 +31,23 @@ const AdminAboutManager = ({ onBack, currentStoreId }) => {
         .from('about_content')
         .select('*')
         .eq('store_id', currentStoreId)
-        .maybeSingle();
+        .order('id', { ascending: false })
+        .limit(1);
       
       if (error) throw error;
-      if (data) {
-        setExistingId(data.id);
+      if (data && data.length > 0) {
+        const item = data[0];
+        setExistingId(item.id);
         setFormData({
-          title: data.title || '',
-          description: data.description || '',
-          image_url: data.image_url || '',
-          phone: data.phone || '',
-          email: data.email || '',
-          address: data.address || '',
-          whatsapp: data.whatsapp || '',
-          instagram: data.instagram || '',
-          pinterest: data.pinterest || ''
+          title: item.title || '',
+          description: item.description || '',
+          image_url: item.image_url || '',
+          phone: item.phone || '',
+          email: item.email || '',
+          address: item.address || '',
+          whatsapp: item.whatsapp || '',
+          instagram: item.instagram || '',
+          pinterest: item.pinterest || ''
         });
       }
     } catch (error) {
