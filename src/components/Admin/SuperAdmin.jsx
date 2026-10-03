@@ -13,6 +13,40 @@ const SuperAdmin = () => {
   const [devBypass, setDevBypass] = useState(localStorage.getItem('dev_master_bypass') === 'true');
   const [formData, setFormData] = useState({ name: '', slug: '', owner_id: '' });
   const [message, setMessage] = useState({ type: '', text: '' });
+  const [toastMessage, setToastMessage] = useState('');
+
+  const showToast = (msg) => {
+    setToastMessage(msg);
+    setTimeout(() => setToastMessage(''), 2500);
+  };
+
+  const copyToClipboard = (text, label) => {
+    navigator.clipboard.writeText(text);
+    showToast(`✓ ${label} copiado!`);
+  };
+
+  const shareStoreOnWhatsApp = (store) => {
+    const origin = window.location.origin;
+    const storeUrl = `${origin}/${store.slug}`;
+    const adminUrl = `${origin}/${store.slug}/admin`;
+    const text = encodeURIComponent(
+      `*Olá! Sua loja "${store.name}" já está no ar!* 🎉\n\n` +
+      `🛍️ *Sua Vitrine Pública:* ${storeUrl}\n` +
+      `⚙️ *Seu Painel de Controle:* ${adminUrl}\n\n` +
+      `Use seu e-mail e sua senha cadastrados para acessar o painel e gerenciar seus produtos.`
+    );
+    window.open(`https://api.whatsapp.com/send?text=${text}`, '_blank');
+  };
+
+  const shareSignupOnWhatsApp = () => {
+    const signupUrl = `${window.location.origin}/signup`;
+    const text = encodeURIComponent(
+      `*Olá! Crie seu acesso de artesão no link abaixo:*\n\n` +
+      `👉 ${signupUrl}\n\n` +
+      `Preencha seu e-mail e crie sua senha. Ao finalizar, copie o ID de Usuário e me envie para eu ativar sua loja!`
+    );
+    window.open(`https://api.whatsapp.com/send?text=${text}`, '_blank');
+  };
 
   useEffect(() => {
     checkUser();
@@ -193,13 +227,57 @@ const SuperAdmin = () => {
         </div>
       )}
 
-      <header style={{ textAlign: 'center', marginBottom: '4rem' }}>
+      <header style={{ textAlign: 'center', marginBottom: '2.5rem' }}>
         <span style={{ fontSize: '0.6rem', letterSpacing: '0.2rem', opacity: 0.5 }}>PLATFORM MANAGEMENT</span>
-        <h1 style={{ fontSize: '1.5rem', letterSpacing: '0.3rem', marginTop: '1rem' }}>SUPER ADMIN</h1>
-        <div style={{ width: '40px', height: '1px', background: '#000', margin: '2rem auto' }}></div>
+        <h1 style={{ fontSize: '1.5rem', letterSpacing: '0.3rem', marginTop: '0.8rem' }}>SUPER ADMIN</h1>
+        <div style={{ width: '40px', height: '1px', background: '#000', margin: '1.5rem auto' }}></div>
       </header>
 
-      <section style={{ marginBottom: '4rem', background: '#f9f9f9', padding: '2rem' }}>
+      {/* Quick Action Hub for Artisan Onboarding */}
+      <section style={{ marginBottom: '2.5rem', background: '#eef2ff', border: '1px solid #c7d2fe', padding: '1.5rem', borderRadius: '6px' }}>
+        <span style={{ fontSize: '0.65rem', fontWeight: 'bold', color: '#3730a3', letterSpacing: '0.05rem', display: 'block', marginBottom: '0.8rem' }}>
+          ⚡ ATALHOS RÁPIDOS DE CADASTRO (PARA ENVIAR AO ARTESÃO)
+        </span>
+        <div style={{ display: 'flex', gap: '0.8rem', flexWrap: 'wrap' }}>
+          <button
+            type="button"
+            onClick={shareSignupOnWhatsApp}
+            style={{
+              padding: '0.6rem 1.2rem',
+              background: '#25D366',
+              color: '#fff',
+              border: 'none',
+              borderRadius: '4px',
+              fontSize: '0.65rem',
+              fontWeight: 'bold',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.4rem'
+            }}
+          >
+            📲 ENVIAR CADASTRO NO WHATSAPP
+          </button>
+          <button
+            type="button"
+            onClick={() => copyToClipboard(`${window.location.origin}/signup`, 'Link de Cadastro')}
+            style={{
+              padding: '0.6rem 1.2rem',
+              background: '#3730a3',
+              color: '#fff',
+              border: 'none',
+              borderRadius: '4px',
+              fontSize: '0.65rem',
+              fontWeight: 'bold',
+              cursor: 'pointer'
+            }}
+          >
+            📋 COPIAR LINK /signup
+          </button>
+        </div>
+      </section>
+
+      <section style={{ marginBottom: '3rem', background: '#f9f9f9', padding: '2rem', borderRadius: '6px' }}>
         <h2 style={{ fontSize: '0.8rem', marginBottom: '2rem', letterSpacing: '0.1rem' }}>CRIAR NOVA LOJA</h2>
         <form onSubmit={handleCreateStore} style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
@@ -230,7 +308,7 @@ const SuperAdmin = () => {
               type="text" 
               value={formData.owner_id} 
               onChange={e => setFormData({...formData, owner_id: e.target.value})} 
-              placeholder="Pague o ID do artesão no Supabase"
+              placeholder="Cole o ID do artesão gerado no /signup"
               style={{ padding: '0.8rem', border: '1px solid #ddd', outline: 'none' }}
             />
           </div>
@@ -265,87 +343,186 @@ const SuperAdmin = () => {
 
       <section>
         <h2 style={{ fontSize: '0.8rem', marginBottom: '2rem', letterSpacing: '0.1rem' }}>LOJAS EXISTENTES</h2>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
           {stores.map(store => (
             <div key={store.id} style={{ 
               padding: '1.5rem', 
               border: '1px solid #eee', 
               display: 'flex', 
-              justifyContent: 'space-between', 
-              alignItems: 'center',
-              opacity: store.is_active ? 1 : 0.5,
-              background: store.is_active ? 'white' : '#f5f5f5'
+              flexDirection: 'column',
+              gap: '1.2rem',
+              opacity: store.is_active ? 1 : 0.6,
+              background: store.is_active ? 'white' : '#f9f9f9',
+              borderRadius: '6px',
+              boxShadow: '0 2px 8px rgba(0,0,0,0.03)'
             }}>
-              <div style={{ flex: 1 }}>
-                <h3 style={{ fontSize: '0.9rem', marginBottom: '0.3rem' }}>{store.name}</h3>
-                <p style={{ fontSize: '0.7rem', opacity: 0.5, marginBottom: '1rem' }}>Slug: <strong>/{store.slug}</strong></p>
-                
-                <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
-                  <input 
-                    type="text" 
-                    defaultValue={store.owner_id || ''} 
-                    placeholder="ID do Dono (UUID)"
-                    onBlur={(e) => {
-                      if (e.target.value !== store.owner_id) {
-                        updateOwner(store.id, e.target.value);
-                      }
-                    }}
-                    style={{ fontSize: '0.6rem', padding: '0.3rem', width: '200px', border: '1px solid #ddd' }}
-                  />
-                  <span style={{ fontSize: '0.5rem', opacity: 0.4 }}>← EDITAR DONO</span>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '1rem' }}>
+                <div>
+                  <h3 style={{ fontSize: '1.05rem', marginBottom: '0.3rem' }}>{store.name}</h3>
+                  <p style={{ fontSize: '0.7rem', opacity: 0.6, marginBottom: '0.6rem' }}>Slug: <strong>/{store.slug}</strong></p>
+                  <span style={{ 
+                    fontSize: '0.6rem', 
+                    color: store.is_active ? '#166534' : '#991b1b', 
+                    fontWeight: 'bold',
+                    background: store.is_active ? '#dcfce7' : '#fee2e2',
+                    padding: '0.2rem 0.5rem',
+                    borderRadius: '3px'
+                  }}>
+                    {store.is_active ? '● LOJA ATIVA' : '○ LOJA BLOQUEADA'}
+                  </span>
                 </div>
 
-                <p style={{ 
-                  fontSize: '0.6rem', 
-                  color: store.is_active ? 'green' : 'red', 
-                  fontWeight: 'bold',
-                  marginTop: '1rem'
-                }}>
-                  {store.is_active ? '● ATIVA' : '○ INATIVA'}
-                </p>
+                <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+                  <button
+                    type="button"
+                    onClick={() => shareStoreOnWhatsApp(store)}
+                    style={{
+                      padding: '0.5rem 0.8rem',
+                      background: '#25D366',
+                      color: '#fff',
+                      border: 'none',
+                      borderRadius: '4px',
+                      fontSize: '0.6rem',
+                      fontWeight: 'bold',
+                      cursor: 'pointer'
+                    }}
+                  >
+                    📲 ENVIAR NO WHATSAPP
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => copyToClipboard(`${window.location.origin}/${store.slug}`, 'Link da Vitrine')}
+                    style={{
+                      padding: '0.5rem 0.8rem',
+                      background: '#f3f4f6',
+                      color: '#333',
+                      border: '1px solid #d1d5db',
+                      borderRadius: '4px',
+                      fontSize: '0.6rem',
+                      cursor: 'pointer'
+                    }}
+                  >
+                    📋 COPIAR VITRINE
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => copyToClipboard(`${window.location.origin}/${store.slug}/admin`, 'Link do Painel')}
+                    style={{
+                      padding: '0.5rem 0.8rem',
+                      background: '#f3f4f6',
+                      color: '#333',
+                      border: '1px solid #d1d5db',
+                      borderRadius: '4px',
+                      fontSize: '0.6rem',
+                      cursor: 'pointer'
+                    }}
+                  >
+                    📋 COPIAR ADMIN
+                  </button>
+                </div>
               </div>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', alignItems: 'flex-end' }}>
+
+              {/* Owner UUID Edit Section */}
+              <div style={{ background: '#f8fafc', padding: '0.8rem', borderRadius: '4px', border: '1px solid #e2e8f0' }}>
+                <span style={{ fontSize: '0.6rem', fontWeight: 'bold', color: '#475569', display: 'block', marginBottom: '0.4rem' }}>
+                  DONO DA LOJA (USER ID):
+                </span>
+                <div style={{ display: 'flex', gap: '0.4rem', alignItems: 'center', flexWrap: 'wrap' }}>
+                  <input 
+                    id={`owner-input-${store.id}`}
+                    type="text" 
+                    defaultValue={store.owner_id || ''} 
+                    placeholder="Cole aqui o ID gerado no /signup"
+                    style={{ fontSize: '0.65rem', padding: '0.45rem', flex: 1, minWidth: '220px', border: '1px solid #cbd5e1', borderRadius: '3px' }}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const input = document.getElementById(`owner-input-${store.id}`);
+                      if (input) updateOwner(store.id, input.value.trim());
+                    }}
+                    style={{
+                      padding: '0.45rem 0.9rem',
+                      background: '#0f172a',
+                      color: '#fff',
+                      border: 'none',
+                      borderRadius: '3px',
+                      fontSize: '0.6rem',
+                      fontWeight: 'bold',
+                      cursor: 'pointer'
+                    }}
+                  >
+                    SALVAR DONO
+                  </button>
+                </div>
+              </div>
+
+              {/* Store Actions (Toggle & Delete) */}
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: '1px solid #f1f5f9', paddingTop: '0.8rem' }}>
                 <a 
                   href={`/${store.slug}`} 
                   target="_blank" 
                   rel="noreferrer"
-                  style={{ fontSize: '0.6rem', textDecoration: 'underline' }}
+                  style={{ fontSize: '0.65rem', textDecoration: 'underline', color: '#2563eb' }}
                 >
-                  VER SITE
+                  Abrir vitrine em nova aba &rarr;
                 </a>
-                <button 
-                  onClick={() => toggleStoreStatus(store)}
-                  style={{ 
-                    fontSize: '0.6rem', 
-                    padding: '0.4rem 0.8rem', 
-                    background: store.is_active ? '#fff5f5' : '#e6fffa',
-                    color: store.is_active ? '#c53030' : '#2c7a7b',
-                    border: `1px solid ${store.is_active ? '#feb2b2' : '#b2f5ea'}`,
-                    cursor: 'pointer',
-                    width: '100%'
-                  }}
-                >
-                  {store.is_active ? 'BLOQUEAR ACESSO' : 'ATIVAR ACESSO'}
-                </button>
-                <button 
-                  onClick={() => deleteStore(store)}
-                  style={{ 
-                    fontSize: '0.6rem', 
-                    padding: '0.4rem 0.8rem', 
-                    background: 'none',
-                    color: '#999',
-                    border: '1px solid #eee',
-                    cursor: 'pointer',
-                    width: '100%'
-                  }}
-                >
-                  EXCLUIR LOJA
-                </button>
+                <div style={{ display: 'flex', gap: '0.5rem' }}>
+                  <button 
+                    onClick={() => toggleStoreStatus(store)}
+                    style={{ 
+                      fontSize: '0.6rem', 
+                      padding: '0.4rem 0.8rem', 
+                      background: store.is_active ? '#fff5f5' : '#e6fffa',
+                      color: store.is_active ? '#c53030' : '#2c7a7b',
+                      border: `1px solid ${store.is_active ? '#feb2b2' : '#b2f5ea'}`,
+                      borderRadius: '3px',
+                      cursor: 'pointer'
+                    }}
+                  >
+                    {store.is_active ? 'BLOQUEAR' : 'ATIVAR'}
+                  </button>
+                  <button 
+                    onClick={() => deleteStore(store)}
+                    style={{ 
+                      fontSize: '0.6rem', 
+                      padding: '0.4rem 0.8rem', 
+                      background: 'none',
+                      color: '#999',
+                      border: '1px solid #e5e7eb',
+                      borderRadius: '3px',
+                      cursor: 'pointer'
+                    }}
+                  >
+                    EXCLUIR
+                  </button>
+                </div>
               </div>
             </div>
           ))}
         </div>
       </section>
+
+      {/* Floating Toast Notification */}
+      {toastMessage && (
+        <div style={{
+          position: 'fixed',
+          bottom: '2rem',
+          left: '50%',
+          transform: 'translateX(-50%)',
+          background: '#1e293b',
+          color: '#fff',
+          padding: '0.8rem 1.5rem',
+          borderRadius: '30px',
+          fontSize: '0.75rem',
+          fontWeight: 'bold',
+          boxShadow: '0 4px 15px rgba(0,0,0,0.2)',
+          zIndex: 9999,
+          animation: 'fadeIn 0.3s ease'
+        }}>
+          {toastMessage}
+        </div>
+      )}
       
       <div style={{ marginTop: '4rem', textAlign: 'center' }}>
         <a href="/" style={{ fontSize: '0.7rem', opacity: 0.5 }}>&larr; VOLTAR AO SITE</a>

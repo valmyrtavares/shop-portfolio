@@ -7,12 +7,15 @@ const AdminSignup = () => {
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [createdUserId, setCreatedUserId] = useState('');
+  const [copied, setCopied] = useState(false);
   const [message, setMessage] = useState({ type: '', text: '' });
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     setMessage({ type: '', text: '' });
+    setCreatedUserId('');
 
     try {
       const { data, error } = await supabase.auth.signUp({
@@ -22,11 +25,12 @@ const AdminSignup = () => {
 
       if (error) throw error;
       
-      const userId = data.user?.id || 'ID pendente de confirmação';
+      const userId = data.user?.id || '';
+      setCreatedUserId(userId);
 
       setMessage({ 
         type: 'success', 
-        text: `CONTA CRIADA! Informe este ID ao administrador para ativar sua loja:\n\nID: ${userId}` 
+        text: 'CONTA CRIADA COM SUCESSO!' 
       });
       setEmail('');
       setPassword('');
@@ -35,6 +39,19 @@ const AdminSignup = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleCopyId = () => {
+    if (createdUserId) {
+      navigator.clipboard.writeText(createdUserId);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2500);
+    }
+  };
+
+  const handleSendWhatsApp = () => {
+    const text = encodeURIComponent(`Olá! Acabei de criar minha conta no Vitrine Artesanal.\nMeu ID de Usuário é:\n${createdUserId}`);
+    window.open(`https://api.whatsapp.com/send?text=${text}`, '_blank');
   };
 
   return (
@@ -99,6 +116,54 @@ const AdminSignup = () => {
           {message.text && (
             <div className={`${styles.message} ${styles[message.type]}`} style={{ marginTop: '1.5rem', fontSize: '0.7rem' }}>
               {message.text}
+            </div>
+          )}
+
+          {createdUserId && (
+            <div style={{ marginTop: '1.5rem', padding: '1.2rem', background: '#f0fdf4', border: '1px solid #bbf7d0', borderRadius: '6px', textAlign: 'center' }}>
+              <span style={{ fontSize: '0.65rem', fontWeight: 'bold', color: '#166534', display: 'block', marginBottom: '0.5rem' }}>
+                SEU ID DE ARTESÃO GERADO:
+              </span>
+              <div style={{ background: '#fff', padding: '0.6rem', border: '1px dashed #86efac', borderRadius: '4px', fontSize: '0.7rem', fontFamily: 'monospace', wordBreak: 'break-all', marginBottom: '1rem', color: '#14532d', fontWeight: 'bold' }}>
+                {createdUserId}
+              </div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.6rem' }}>
+                <button
+                  type="button"
+                  onClick={handleCopyId}
+                  style={{
+                    padding: '0.6rem',
+                    background: copied ? '#15803d' : '#222',
+                    color: '#fff',
+                    border: 'none',
+                    borderRadius: '4px',
+                    fontSize: '0.65rem',
+                    fontWeight: 'bold',
+                    letterSpacing: '0.05rem',
+                    cursor: 'pointer',
+                    transition: 'all 0.2s ease'
+                  }}
+                >
+                  {copied ? '✓ ID COPIADO COM SUCESSO!' : '📋 COPIAR MEU ID'}
+                </button>
+                <button
+                  type="button"
+                  onClick={handleSendWhatsApp}
+                  style={{
+                    padding: '0.6rem',
+                    background: '#25D366',
+                    color: '#fff',
+                    border: 'none',
+                    borderRadius: '4px',
+                    fontSize: '0.65rem',
+                    fontWeight: 'bold',
+                    letterSpacing: '0.05rem',
+                    cursor: 'pointer'
+                  }}
+                >
+                  📲 ENVIAR MEU ID NO WHATSAPP
+                </button>
+              </div>
             </div>
           )}
         </form>

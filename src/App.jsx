@@ -242,9 +242,30 @@ const ShopContent = ({
         {isForAdmin ? (
           <section id="admin">
             {!isAuthenticated ? <AdminLogin /> : (!isOwner && !isMaster) ? (
-              <div style={{ textAlign: 'center', padding: '10rem 0' }}>
-                <h2>ACESSO NEGADO</h2>
-                <button onClick={handleLogout} style={{ marginTop: '1rem', textDecoration: 'underline', background: 'none', border: 'none', cursor: 'pointer' }}>SAIR</button>
+              <div style={{ textAlign: 'center', padding: '6rem 2rem', maxWidth: '500px', margin: '0 auto' }}>
+                <h2 style={{ fontSize: '1.2rem', marginBottom: '1rem', letterSpacing: '0.1rem' }}>ACESSO NEGADO</h2>
+                <p style={{ fontSize: '0.75rem', opacity: 0.7, marginBottom: '1.5rem', lineHeight: '1.5' }}>
+                  A conta autenticada não possui permissão para administrar esta loja.
+                </p>
+                <div style={{ background: '#f8f8f8', border: '1px solid #eee', padding: '1rem', borderRadius: '4px', textAlign: 'left', fontSize: '0.65rem', marginBottom: '2rem', display: 'flex', flexDirection: 'column', gap: '0.6rem' }}>
+                  <div><strong>Email logado:</strong> {currentUser?.email}</div>
+                  <div style={{ wordBreak: 'break-all' }}><strong>Seu User ID:</strong> {currentUser?.id}</div>
+                  <div style={{ wordBreak: 'break-all' }}><strong>ID do Dono da Loja:</strong> {currentStore?.owner_id || 'Nenhum dono vinculado'}</div>
+                </div>
+                <button 
+                  onClick={handleLogout} 
+                  style={{ 
+                    padding: '0.7rem 1.5rem', 
+                    background: '#000', 
+                    color: '#fff', 
+                    border: 'none', 
+                    fontSize: '0.65rem', 
+                    letterSpacing: '0.1rem',
+                    cursor: 'pointer' 
+                  }}
+                >
+                  SAIR / TROCAR DE CONTA
+                </button>
               </div>
             ) : (
               <>
