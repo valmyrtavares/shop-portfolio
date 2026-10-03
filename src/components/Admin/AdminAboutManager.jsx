@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../../lib/supabase';
-import { resizeImage } from '../../lib/imageUtils';
+import { compressImage } from '../../lib/imageUtils';
 import styles from './AdminAboutManager.module.scss';
 
 const AdminAboutManager = ({ onBack, currentStoreId }) => {
